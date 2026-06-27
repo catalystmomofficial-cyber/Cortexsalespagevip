@@ -143,7 +143,7 @@ section { padding: 100px 0; }
 .hero-cta-note { font-size: 11px; color: var(--text-muted); }
 
 /* ── iPHONE 16 PRO ── */
-.iphone-wrap { display: flex; justify-content: center; align-items: center; }
+.iphone-wrap { display: flex; justify-content: center; align-items: center; perspective: 1000px; }
 .iphone {
   width: 256px;
   background: linear-gradient(160deg, #2C2C2E 0%, #1C1C1E 40%, #141416 100%);
@@ -153,6 +153,9 @@ section { padding: 100px 0; }
     0 40px 80px rgba(26,20,16,0.3),
     0 80px 120px rgba(26,20,16,0.15);
   position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
 }
 .iphone::after {
   content: '';
@@ -1113,6 +1116,33 @@ function closeForm() {
   document.body.style.overflow = '';
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeForm(); });
+
+// ── iPhone mockup tilt (mouse on desktop, gyro on mobile) ──
+(function() {
+  const wrap = document.querySelector('.iphone-wrap');
+  const phone = document.querySelector('.iphone');
+  if (!wrap || !phone) return;
+  const MAX_TILT = 14;
+
+  wrap.addEventListener('mousemove', (e) => {
+    const rect = wrap.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    phone.style.transform = `rotateY(${x * MAX_TILT}deg) rotateX(${-y * MAX_TILT}deg)`;
+  });
+  wrap.addEventListener('mouseleave', () => {
+    phone.style.transform = 'rotateY(0deg) rotateX(0deg)';
+  });
+
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', (e) => {
+      if (e.beta === null || e.gamma === null) return;
+      const x = Math.max(-1, Math.min(1, e.gamma / 45));
+      const y = Math.max(-1, Math.min(1, (e.beta - 45) / 45));
+      phone.style.transform = `rotateY(${x * MAX_TILT}deg) rotateX(${-y * MAX_TILT}deg)`;
+    });
+  }
+})();
 
 async function handleSubmit(e) {
   e.preventDefault();
