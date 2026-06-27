@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cortex — Private Business Operating System</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream:     #F7F3EE;
+  --cream2:    #EEE8DF;
+  --cream3:    #E4DDD3;
+  --white:     #FFFFFF;
+  --dark:      #1A1410;
+  --dark2:     #2A2018;
+  --dark3:     #3A3028;
+  --gold:      #B8841A;
+  --gold-lt:   #C8A96E;
+  --gold-bg:   rgba(184,132,26,0.06);
+  --gold-bdr:  rgba(184,132,26,0.18);
+  --green:     #2D7A62;
+  --green-bg:  rgba(45,122,98,0.07);
+  --green-bdr: rgba(45,122,98,0.2);
+  --amber:     #B8841A;
+  --amber-bg:  rgba(184,132,26,0.07);
+  --amber-bdr: rgba(184,132,26,0.2);
+  --red:       #C0442A;
+  --red-bg:    rgba(192,68,42,0.07);
+  --red-bdr:   rgba(192,68,42,0.2);
+  --border:    #DDD5C8;
+  --border2:   #C8BEA8;
+  --text:      #5A4E3A;
+  --text-dim:  #8A7A62;
+  --text-muted:#B0A090;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--cream);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px; line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 18px 48px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(247,243,238,0.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 2px solid var(--gold);
+}
+nav::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold-lt) 30%, var(--gold) 60%, transparent);
+}
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.1em;
+}
+.nav-logo em { color: var(--dark); font-style: normal; }
+.nav-pill {
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--gold); border: 1px solid var(--gold-bdr);
+  border-radius: 3px; padding: 3px 9px; margin-left: 10px;
+  vertical-align: middle; background: var(--gold-bg);
+}
+.nav-cta {
+  background: var(--gold); color: var(--white);
+  border: none; border-radius: 7px;
+  padding: 10px 22px; font-size: 12px; font-weight: 700;
+  cursor: pointer; text-decoration: none;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  transition: all 0.2s;
+}
+.nav-cta:hover { background: var(--gold-lt); transform: translateY(-1px); }
+
+/* ── LAYOUT ── */
+.container { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+.container--wide { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+section { padding: 100px 0; }
+
+/* ── HERO ── */
+#hero {
+  min-height: 100vh; padding: 140px 0 100px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+}
+.hero-inner {
+  display: grid; grid-template-columns: 1.1fr 0.9fr;
+  gap: 80px; align-items: center;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 26px; font-weight: 700;
+  background: var(--gold-bg); border: 1px solid var(--gold-bdr);
+  border-radius: 4px; padding: 6px 14px;
+}
+.hero-eyebrow::before { content: '◈'; font-size: 10px; }
+.hero-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(38px, 5.5vw, 66px);
+  font-weight: 300; line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--dark); margin-bottom: 28px;
+}
+.hero-headline strong { font-weight: 700; display: block; }
+.hero-headline em { color: var(--gold); font-style: italic; }
+
+/* ZEIGARNIK — open loop questions */
+.hero-questions {
+  border-left: 3px solid var(--gold);
+  padding-left: 20px; margin-bottom: 28px;
+  background: linear-gradient(90deg, var(--gold-bg), transparent);
+  padding-top: 8px; padding-bottom: 8px; border-radius: 0 8px 8px 0;
+}
+.hero-q {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px; font-style: italic;
+  color: var(--text-dim); line-height: 1.7; padding: 4px 0;
+}
+.hero-statement {
+  font-size: 15px; color: var(--text);
+  line-height: 1.85; margin-bottom: 36px; max-width: 480px;
+}
+.hero-statement strong { color: var(--dark); }
+.hero-cta-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.hero-cta {
+  display: inline-block;
+  background: var(--gold); color: var(--white);
+  border-radius: 8px; padding: 16px 34px;
+  font-size: 12px; font-weight: 700;
+  text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(184,132,26,0.25);
+}
+.hero-cta:hover { background: var(--gold-lt); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(184,132,26,0.3); }
+.hero-cta-note { font-size: 11px; color: var(--text-muted); }
+
+/* ── iPHONE 16 PRO ── */
+.iphone-wrap { display: flex; justify-content: center; align-items: center; }
+.iphone {
+  width: 256px;
+  background: linear-gradient(160deg, #2C2C2E 0%, #1C1C1E 40%, #141416 100%);
+  border-radius: 52px; padding: 3px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.1),
+    0 40px 80px rgba(26,20,16,0.3),
+    0 80px 120px rgba(26,20,16,0.15);
+  position: relative;
+}
+.iphone::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: 52px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 35%, transparent 65%, rgba(255,255,255,0.06) 100%);
+  pointer-events: none; z-index: 10;
+}
+.iphone-inner { background: #060810; border-radius: 49px; overflow: hidden; position: relative; }
+.dynamic-island {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  width: 118px; height: 34px;
+  background: #000; border-radius: 20px; z-index: 5;
+}
+.dynamic-island::after {
+  content: '';
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #1A1A1C;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.06), 0 0 6px rgba(61,158,122,0.3);
+}
+.iphone-btn-l1 { position: absolute; left: -3px; top: 116px; width: 3px; height: 32px; background: linear-gradient(180deg,#3A3A3C,#2C2C2E); border-radius: 2px 0 0 2px; }
+.iphone-btn-l2 { position: absolute; left: -3px; top: 160px; width: 3px; height: 62px; background: linear-gradient(180deg,#3A3A3C,#2C2C2E); border-radius: 2px 0 0 2px; }
+.iphone-btn-r  { position: absolute; right: -3px; top: 136px; width: 3px; height: 80px; background: linear-gradient(180deg,#3A3A3C,#2C2C2E); border-radius: 0 2px 2px 0; }
+.iphone-screen { padding-top: 58px; }
+.iphone-home { height: 28px; display: flex; align-items: center; justify-content: center; background: #060810; }
+.iphone-home-bar { width: 96px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+/* App UI inside phone */
+.a-head { padding: 8px 13px 7px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+.a-logo { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #C8A96E; font-weight: 700; letter-spacing: 0.06em; }
+.a-biz  { font-size: 7px; color: #2A2820; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
+.a-pulse { font-size: 7px; color: #C8A96E; background: rgba(200,169,110,0.08); border: 1px solid rgba(200,169,110,0.2); border-radius: 4px; padding: 3px 7px; }
+.a-body { padding: 9px 11px; }
+.a-1task { background: linear-gradient(135deg,rgba(200,169,110,0.08),rgba(200,169,110,0.03)); border: 1px solid rgba(200,169,110,0.15); border-left: 2px solid #C8A96E; border-radius: 7px; padding: 8px 10px; margin-bottom: 8px; }
+.a-1lbl { font-size: 6px; color: #C8A96E; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 3px; }
+.a-1txt { font-size: 10px; color: #E8DCC8; line-height: 1.4; }
+.a-krow { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; margin-bottom: 8px; }
+.a-kcard { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 6px 4px; text-align: center; }
+.a-knum  { font-family: 'Cormorant Garamond',serif; font-size: 17px; font-weight: 700; line-height: 1; }
+.a-klbl  { font-size: 5px; color: #2A2820; margin-top: 3px; letter-spacing: 0.08em; text-transform: uppercase; }
+.a-dlbl  { font-size: 6px; color: #2A2820; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 5px; }
+.a-dcard { border-radius: 6px; padding: 7px 9px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; border: 1px solid; }
+.a-dcard.g { background: rgba(61,158,122,0.06);  border-color: rgba(61,158,122,0.15);  border-left: 2px solid #3D9E7A; }
+.a-dcard.f { background: rgba(200,169,110,0.06); border-color: rgba(200,169,110,0.15); border-left: 2px solid #C8A96E; }
+.a-dcard.o { background: rgba(192,68,42,0.06);   border-color: rgba(192,68,42,0.15);   border-left: 2px solid #C05A44; }
+.a-dn { font-size: 9px; font-weight: 600; color: #D0C8B8; }
+.a-ds { font-size: 6px; color: #2A2820; margin-top: 1px; }
+.a-di { font-size: 10px; margin-right: 5px; }
+.a-dpill { font-size: 6px; font-weight: 700; border-radius: 8px; padding: 2px 6px; }
+.a-nav { display: flex; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.05); padding: 6px 0 3px; }
+.a-ni { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.a-nic { font-size: 10px; }
+.a-nlb { font-size: 5px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* ── VULNERABILITY QUESTIONS ── */
+#questions {
+  background: var(--cream2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+}
+.questions-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+}
+.questions-left {
+  padding: 80px 48px 80px 32px;
+  border-right: 1px solid var(--border);
+}
+.questions-right { padding: 80px 32px 80px 48px; }
+.q-label {
+  font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 28px; display: inline-block; font-weight: 700;
+  background: var(--gold-bg); border: 1px solid var(--gold-bdr);
+  border-radius: 4px; padding: 5px 12px;
+}
+.q-item {
+  padding: 18px 0; border-bottom: 1px solid var(--border);
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.q-item:last-child { border-bottom: none; }
+.q-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--text-muted);
+  flex-shrink: 0; margin-top: 4px; width: 20px;
+}
+.q-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px; font-style: italic;
+  color: var(--text); line-height: 1.5;
+}
+.q-text strong { color: var(--dark); font-style: normal; font-weight: 700; }
+.answer-block {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 14px; padding: 26px 24px; margin-bottom: 16px;
+  transition: box-shadow 0.3s ease;
+}
+.answer-block:hover { box-shadow: 0 8px 24px rgba(26,20,16,0.07); }
+.answer-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px; font-weight: 300; color: var(--dark);
+  line-height: 1.3; margin-bottom: 10px;
+}
+.answer-headline strong { font-weight: 700; color: var(--gold); }
+.answer-body { font-size: 14px; color: var(--text); line-height: 1.75; }
+
+/* ── TENSION — dark strip ── */
+#tension {
+  background: var(--dark);
+  padding: 90px 0;
+}
+.t-line {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(22px, 3.2vw, 40px);
+  font-weight: 300; line-height: 1.4;
+  color: #3A3028; margin-bottom: 8px;
+}
+
+.t-line.lit { color: #A8A090; }
+.t-line.gold { color: var(--gold-lt); font-weight: 600; }
+.t-line.big { font-size: clamp(28px, 4.5vw, 54px); font-weight: 700; color: #E8DCC8; margin-top: 16px; }
+
+/* ── FRAMEWORK ── */
+#framework { background: var(--cream); padding: 100px 0; }
+.framework-top {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: start; margin-bottom: 52px;
+}
+.framework-statement {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(26px, 3.5vw, 40px);
+  font-weight: 300; line-height: 1.4; color: var(--text);
+}
+.framework-statement strong { color: var(--dark); font-weight: 700; }
+.framework-statement em { color: var(--gold); font-style: italic; }
+.framework-body { font-size: 15px; color: var(--text); line-height: 1.85; padding-top: 6px; }
+.framework-body strong { color: var(--dark); }
+.three-domains { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.db {
+  border-radius: 14px; padding: 28px 22px; border: 1px solid;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.db:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(26,20,16,0.08); }
+.db.g { background: var(--green-bg); border-color: var(--green-bdr); }
+.db.f { background: var(--amber-bg); border-color: var(--amber-bdr); }
+.db.o { background: var(--red-bg);   border-color: var(--red-bdr);   }
+.db-ico { font-size: 24px; margin-bottom: 14px; display: block; }
+.db-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+.db.g .db-name { color: var(--green); }
+.db.f .db-name { color: var(--gold); }
+.db.o .db-name { color: var(--red); }
+.db-desc { font-size: 12px; color: var(--text); line-height: 1.7; margin-bottom: 14px; }
+.db-examples { display: flex; flex-direction: column; gap: 4px; }
+.db-ex { font-size: 10px; color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
+.db-ex::before { content: '—'; opacity: 0.5; font-size: 9px; }
+
+/* ── STAGES ── */
+#stages { background: var(--white); padding: 100px 0; border-top: 1px solid var(--border); }
+.stages-intro {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 300; color: var(--dark); line-height: 1.3; margin-bottom: 14px;
+}
+.stages-intro em { color: var(--gold); font-style: italic; }
+.stages-sub { font-size: 15px; color: var(--text); line-height: 1.85; max-width: 580px; margin-bottom: 48px; }
+.stages-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); gap: 2px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.stage-card {
+  background: var(--cream); padding: 30px 24px;
+  border-right: 1px solid var(--border);
+  position: relative; transition: background 0.3s;
+}
+.stage-card:last-child { border-right: none; }
+.stage-card:hover { background: var(--cream2); }
+.stage-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--gold); opacity: 0; transition: opacity 0.3s;
+}
+.stage-card:hover::before { opacity: 1; }
+.stage-marker { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--gold); letter-spacing: 0.12em; margin-bottom: 12px; display: block; font-weight: 600; }
+.stage-name { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+.stage-pain { font-size: 12px; color: var(--text); line-height: 1.7; }
+.stage-quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 13px; color: var(--text-muted);
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--border); line-height: 1.6;
+}
+
+/* ── AI ADVISOR ── */
+#advisor { background: var(--cream); padding: 100px 0; border-top: 1px solid var(--border); }
+.advisor-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; }
+.advisor-lbl {
+  font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 18px; display: inline-block; font-weight: 700;
+  background: var(--gold-bg); border: 1px solid var(--gold-bdr);
+  border-radius: 4px; padding: 5px 12px;
+}
+.advisor-hl {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 300; color: var(--dark); line-height: 1.2; margin-bottom: 18px;
+}
+.advisor-hl strong { font-weight: 700; color: var(--gold); }
+.advisor-body { font-size: 15px; color: var(--text); line-height: 1.85; margin-bottom: 28px; }
+.advisor-pts { display: flex; flex-direction: column; gap: 16px; }
+.advisor-pt { display: flex; gap: 14px; align-items: flex-start; }
+.apt-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--gold-bg); border: 1px solid var(--gold-bdr);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.apt-text { font-size: 13px; color: var(--text); line-height: 1.7; }
+.apt-text strong { color: var(--dark); display: block; margin-bottom: 2px; font-size: 14px; }
+.chat-ui { background: var(--dark); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(26,20,16,0.15); }
+.chat-head { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 10px; }
+.chat-av { width: 34px; height: 34px; border-radius: 50%; background: rgba(200,169,110,0.12); border: 1px solid rgba(200,169,110,0.25); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.chat-nm { font-size: 13px; color: #E8DCC8; font-weight: 600; }
+.chat-st { font-size: 10px; color: #7EB8A4; }
+.chat-msgs { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.cm { padding: 12px 14px; border-radius: 12px; font-size: 13px; line-height: 1.7; max-width: 90%; }
+.cm.u { background: rgba(200,169,110,0.08); border: 1px solid rgba(200,169,110,0.15); color: #C8A96E; align-self: flex-end; border-radius: 12px 12px 3px 12px; }
+.cm.a { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #C8BEA8; align-self: flex-start; border-radius: 12px 12px 12px 3px; }
+
+/* ── BENEFITS ── */
+#benefits { background: var(--cream2); padding: 100px 0; border-top: 1px solid var(--border); }
+.benefits-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; margin-top: 48px; }
+.ben-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 22px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.ben-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(26,20,16,0.08); }
+.ben-stat {
+  font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 700;
+  color: var(--gold); line-height: 1; margin-bottom: 8px;
+  display: inline-block;
+  border-bottom: 2px solid var(--gold-bdr); padding-bottom: 4px;
+}
+.ben-name { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+.ben-body { font-size: 12px; color: var(--text); line-height: 1.7; }
+
+/* ── LOOP CLOSE ── */
+#loop-close {
+  background: var(--dark); padding: 90px 0; text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.loop-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(24px, 3.8vw, 50px);
+  font-weight: 300; line-height: 1.5; color: #6A5E4A;
+}
+.loop-text strong { color: #E8DCC8; font-weight: 700; }
+.loop-text em { color: var(--gold-lt); font-style: italic; }
+
+/* ── PRICING ── */
+#pricing { background: var(--white); padding: 100px 0; }
+.pricing-card {
+  max-width: 580px; margin: 52px auto 0;
+  background: var(--dark); border-radius: 20px; padding: 52px 48px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 40px 80px rgba(26,20,16,0.18);
+}
+.pricing-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-lt), transparent);
+}
+.pricing-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold-lt); border: 1px solid rgba(200,169,110,0.25);
+  border-radius: 4px; padding: 5px 12px; margin-bottom: 24px;
+  background: rgba(200,169,110,0.05);
+}
+.pricing-seats {
+  background: rgba(200,169,110,0.04); border: 1px solid rgba(200,169,110,0.12);
+  border-radius: 8px; padding: 12px 16px; margin-bottom: 28px;
+  font-size: 13px; color: #6A5E4A;
+  display: flex; align-items: center; gap: 10px;
+}
+.p-amount { font-family: 'Cormorant Garamond', serif; font-size: 76px; font-weight: 300; color: #E8DCC8; line-height: 1; }
+.p-cur { font-size: 28px; color: #6A5E4A; vertical-align: super; }
+.p-lbl { font-size: 13px; color: #6A5E4A; margin-bottom: 3px; }
+.p-note { font-size: 11px; color: #3A3028; margin-bottom: 22px; }
+.p-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 22px 0; }
+.p-retainer { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+.p-ret-l { font-size: 14px; color: #8A8070; }
+.p-ret-s { font-size: 11px; color: #3A3028; margin-top: 2px; }
+.p-ret-a { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 300; color: var(--gold-lt); }
+.p-items { margin-bottom: 32px; }
+.p-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; color: #8A8070; }
+.p-item:last-child { border-bottom: none; }
+.p-check { color: #7EB8A4; flex-shrink: 0; margin-top: 2px; }
+.p-cta {
+  display: block; width: 100%;
+  background: var(--gold-lt); color: var(--dark);
+  border: none; border-radius: 10px; padding: 18px 32px;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; text-decoration: none;
+  text-align: center; letter-spacing: 0.08em; text-transform: uppercase;
+  transition: all 0.2s;
+}
+.p-cta:hover { background: #D4BC7A; transform: translateY(-1px); }
+.p-footer { font-size: 11px; color: #3A3028; text-align: center; margin-top: 16px; line-height: 1.8; }
+
+/* ── FINAL CLOSE ── */
+#close { background: var(--cream2); padding: 120px 0; text-align: center; border-top: 1px solid var(--border); }
+.close-hl {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 6vw, 74px);
+  font-weight: 300; line-height: 1.15; color: var(--dark); margin-bottom: 24px;
+}
+.close-hl strong { font-weight: 700; }
+.close-hl em { color: var(--gold); font-style: italic; }
+.close-sub { font-size: 16px; color: var(--text); max-width: 440px; margin: 0 auto 48px; line-height: 1.85; }
+.close-cta {
+  display: inline-block; background: var(--dark); color: var(--cream);
+  border-radius: 8px; padding: 18px 48px;
+  font-size: 12px; font-weight: 700;
+  text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase;
+  transition: all 0.2s;
+}
+.close-cta:hover { background: var(--dark2); transform: translateY(-1px); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--dark); padding: 28px 48px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 12px;
+}
+.f-logo { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gold-lt); font-weight: 700; letter-spacing: 0.08em; }
+.f-note { font-size: 11px; color: #3A3028; }
+
+/* ── SHARED ── */
+.s-label {
+  font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px; display: inline-block; font-weight: 700;
+  background: var(--gold-bg); border: 1px solid var(--gold-bdr);
+  border-radius: 4px; padding: 5px 12px;
+}
+.s-hl { font-family: 'Cormorant Garamond', serif; font-size: clamp(30px, 4.5vw, 50px); font-weight: 300; color: var(--dark); line-height: 1.2; margin-bottom: 20px; }
+.s-hl strong { font-weight: 700; }
+.s-sub { font-size: 15px; color: var(--text); max-width: 560px; line-height: 1.85; }
+
+/* ── ANIMATIONS ── */
+/* animations removed — all content visible by default */
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 14px 20px; }
+  section { padding: 64px 0; }
+  .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+  .framework-top { grid-template-columns: 1fr; gap: 28px; }
+  .three-domains { grid-template-columns: 1fr; }
+  .advisor-inner { grid-template-columns: 1fr; gap: 48px; }
+  .questions-inner { grid-template-columns: 1fr; }
+  .questions-left { border-right: none; border-bottom: 1px solid var(--border); padding: 48px 24px; }
+  .questions-right { padding: 48px 24px; }
+  .iphone { width: 220px; }
+  .pricing-card { padding: 32px 24px; }
+  footer { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div style="display:flex;align-items:center;">
+    <div class="nav-logo">CORTEX<em>.</em></div>
+    <span class="nav-pill">Private</span>
+  </div>
+  <a href="#pricing" class="nav-cta">Request Access</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-eyebrow">Private Business Operating System</div>
+        <h1 class="hero-headline">
+          You didn't come this far<br/>
+          to run your business<br/>
+          <em>on instinct alone.</em>
+          <strong>There is a sharper way.</strong>
+        </h1>
+        <div class="hero-questions">
+          <div class="hero-q">When did you last know — clearly — which part of your business was winning?</div>
+          <div class="hero-q">When a problem surfaces, how long has it actually been there?</div>
+          <div class="hero-q">Is your energy going where your business needs it most right now?</div>
+        </div>
+        <p class="hero-statement">
+          Cortex is a <strong>private AI operating system</strong> for serious business owners.
+          It watches everything — Growth, Finance, Operations — and shows you exactly where to put your focus. Every day. Whether you're building something new or scaling what's already working.
+        </p>
+        <div class="hero-cta-row">
+          <a href="#pricing" class="hero-cta">Request Private Access</a>
+          <div class="hero-cta-note">By invitation · Setup in 48hrs</div>
+        </div>
+      </div>
+
+      <!-- iPHONE 16 PRO -->
+      <div class="iphone-wrap">
+        <div class="iphone">
+          <div class="iphone-btn-l1"></div>
+          <div class="iphone-btn-l2"></div>
+          <div class="iphone-btn-r"></div>
+          <div class="iphone-inner">
+            <div class="dynamic-island"></div>
+            <div class="iphone-screen">
+              <div class="a-head">
+                <div><div class="a-logo">CORTEX</div><div class="a-biz">YOUR BUSINESS · PRIVATE</div></div>
+                <div class="a-pulse">Weekly Pulse</div>
+              </div>
+              <div class="a-body">
+                <div class="a-1task">
+                  <div class="a-1lbl">◎ Today's One Thing</div>
+                  <div class="a-1txt">Finalise the Q3 cost review with your supplier</div>
+                </div>
+                <div class="a-krow">
+                  <div class="a-kcard"><div class="a-knum" style="color:#C0C0B0;">6</div><div class="a-klbl">Goals</div></div>
+                  <div class="a-kcard"><div class="a-knum" style="color:#3D9E7A;">4</div><div class="a-klbl">On Track</div></div>
+                  <div class="a-kcard"><div class="a-knum" style="color:#C05A44;">2</div><div class="a-klbl">Action</div></div>
+                </div>
+                <div class="a-dlbl">Domain Health</div>
+                <div class="a-dcard g">
+                  <div style="display:flex;align-items:center;"><span class="a-di">↗</span><div><div class="a-dn">Growth</div><div class="a-ds">2 goals</div></div></div>
+                  <div class="a-dpill" style="color:#3D9E7A;background:rgba(61,158,122,0.12);">On Track</div>
+                </div>
+                <div class="a-dcard f">
+                  <div style="display:flex;align-items:center;"><span class="a-di">◈</span><div><div class="a-dn">Finance</div><div class="a-ds">2 goals</div></div></div>
+                  <div class="a-dpill" style="color:#C8A96E;background:rgba(200,169,110,0.12);">At Risk</div>
+                </div>
+                <div class="a-dcard o">
+                  <div style="display:flex;align-items:center;"><span class="a-di">⬡</span><div><div class="a-dn">Operations</div><div class="a-ds">2 goals</div></div></div>
+                  <div class="a-dpill" style="color:#C05A44;background:rgba(192,68,42,0.12);">Off Track</div>
+                </div>
+              </div>
+              <div class="a-nav">
+                <div class="a-ni"><div class="a-nic" style="color:#C8A96E;">◉</div><div class="a-nlb" style="color:#C8A96E;">Home</div></div>
+                <div class="a-ni"><div class="a-nic" style="color:#2A2820;">◎</div><div class="a-nlb" style="color:#2A2820;">Goals</div></div>
+                <div class="a-ni"><div class="a-nic" style="color:#2A2820;">◌</div><div class="a-nlb" style="color:#2A2820;">Ideas</div></div>
+                <div class="a-ni"><div class="a-nic" style="color:#2A2820;">⬡</div><div class="a-nlb" style="color:#2A2820;">Advisor</div></div>
+                <div class="a-ni"><div class="a-nic" style="color:#2A2820;">◈</div><div class="a-nlb" style="color:#2A2820;">Profile</div></div>
+              </div>
+              <div class="iphone-home"><div class="iphone-home-bar"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- YOUTUBE VIDEO -->
+<section id="video" style="background:#FFFFFF;padding:80px 32px;border-top:1px solid #DDD5C8;border-bottom:1px solid #DDD5C8;">
+  <div style="max-width:640px;margin:0 auto;text-align:center;">
+
+    <div style="display:inline-block;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#B8841A;font-weight:700;background:rgba(184,132,26,0.06);border:1px solid rgba(184,132,26,0.18);border-radius:4px;padding:5px 12px;margin-bottom:20px;">
+      See It In Action
+    </div>
+
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:#1A1410;margin-bottom:12px;line-height:1.3;">
+      One view. Three domains.<br/>
+      <strong style="font-weight:700;color:#B8841A;">Total clarity.</strong>
+    </h2>
+
+    <p style="font-size:15px;color:#8A7A62;margin-bottom:40px;line-height:1.8;">
+      Watch how Cortex works — and how it could work for your business.
+    </p>
+
+    <div style="position:relative;width:100%;padding-top:56.25%;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(26,20,16,0.15);border:1px solid #DDD5C8;">
+      <iframe
+        src="https://www.youtube.com/embed/rrJhEFK0CTU"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+  </div>
+</section>
+
+<!-- QUESTIONS SECTION COMES AFTER -->
+<section id="questions" style="padding:0;">
+  <div class="container--wide">
+    <div class="questions-inner">
+      <div class="questions-left">
+        <span class="q-label">The Questions No One Asks Out Loud</span>
+        <div class="q-item">
+          <div class="q-num">01</div>
+          <div class="q-text">If your <strong>Growth slowed down today</strong> — would you know within 24 hours, or would you feel it weeks later?</div>
+        </div>
+        <div class="q-item">
+          <div class="q-num">02</div>
+          <div class="q-text">How much money <strong>quietly left your business</strong> last month that you haven't fully accounted for yet?</div>
+        </div>
+        <div class="q-item">
+          <div class="q-num">03</div>
+          <div class="q-text">Is there something in your <strong>Operations right now</strong> that you know needs attention — but keeps getting pushed?</div>
+        </div>
+        <div class="q-item">
+          <div class="q-num">04</div>
+          <div class="q-text">When you're working hard every day — <strong>are you certain</strong> you're working on the right things?</div>
+        </div>
+        <div class="q-item">
+          <div class="q-num">05</div>
+          <div class="q-text">How many good ideas have you had in the last 90 days <strong>that never became anything?</strong></div>
+        </div>
+      </div>
+      <div class="questions-right">
+        <span class="q-label">What Cortex Does About This</span>
+        <div class="answer-block">
+          <div class="answer-headline">Your business tells you <strong>exactly where it stands.</strong> Every morning.</div>
+          <div class="answer-body">Green means winning. Yellow means watch it. Red means act now. Across all three domains — simultaneously. Not a feeling. Not a guess. A clear picture, every time you check in.</div>
+        </div>
+        <div class="answer-block">
+          <div class="answer-headline">An advisor that <strong>already knows your business.</strong></div>
+          <div class="answer-body">Not generic advice. Not "it depends." Cortex reads your goals, your numbers, your deadlines — and tells you specifically what to focus on, what's at risk, and what move to make next. At any hour.</div>
+        </div>
+        <div class="answer-block">
+          <div class="answer-headline">Nothing <strong>gets lost</strong> again.</div>
+          <div class="answer-body">Speak an idea. Capture a decision. Set a goal with a deadline and a consequence — not just an intention. The system holds you accountable so your best thinking becomes your best results.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TENSION — ZEIGARNIK -->
+<section id="tension">
+  <div class="container">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3.2vw,40px);font-weight:300;line-height:1.4;color:#3A3028;margin-bottom:8px;">You already know how to run a business.</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3.2vw,40px);font-weight:300;line-height:1.4;color:#A8A090;margin-bottom:8px;">The question is whether it's running at its full potential.</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3.2vw,40px);font-weight:300;line-height:1.4;color:#A8A090;margin-bottom:8px;">Every day without clarity is a day you're leaving something on the table.</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4.5vw,54px);font-weight:700;line-height:1.4;color:#C8A96E;margin-top:16px;">Cortex closes that gap.</div>
+  </div>
+</section>
+
+<!-- FRAMEWORK -->
+<section id="framework">
+  <div class="container">
+    <div class="framework-top fu">
+      <p class="framework-statement">
+        Every business — from day one to decade one —
+        runs on <strong>three domains.</strong>
+        Most owners are strong in one.
+        The one they're <em>ignoring</em> is always where the bleeding starts.
+      </p>
+      <p class="framework-body">
+        It doesn't matter if you're in hospitality, retail, services, or building something completely new. <strong>The framework is the same.</strong> Growth brings in customers. Finance keeps you alive. Operations makes sure you can deliver. When all three are green — you're winning. When one goes red — everything else eventually feels it.
+      </p>
+    </div>
+    <div class="three-domains">
+      <div class="db g fu">
+        <span class="db-ico">↗</span>
+        <div class="db-name">Growth</div>
+        <div class="db-desc">How you get bigger. New customers, new revenue, new reach. If Growth is red — your business is shrinking whether you feel it today or not.</div>
+        <div class="db-examples">
+          <div class="db-ex">New customer acquisition</div>
+          <div class="db-ex">Revenue targets</div>
+          <div class="db-ex">Marketing and partnerships</div>
+          <div class="db-ex">Brand visibility</div>
+        </div>
+      </div>
+      <div class="db f fu">
+        <span class="db-ico">◈</span>
+        <div class="db-name">Finance</div>
+        <div class="db-desc">How you stay alive. Cash flow, margins, costs. Most businesses don't fail from bad products — they fail because nobody was watching the numbers.</div>
+        <div class="db-examples">
+          <div class="db-ex">Cash flow and runway</div>
+          <div class="db-ex">Cost control and margins</div>
+          <div class="db-ex">Profit per product or service</div>
+          <div class="db-ex">Financial targets</div>
+        </div>
+      </div>
+      <div class="db o fu">
+        <span class="db-ico">⬡</span>
+        <div class="db-name">Operations</div>
+        <div class="db-desc">How you run the machine. Staff, systems, delivery, quality. Operations problems become customer problems become reputation problems. Fast.</div>
+        <div class="db-examples">
+          <div class="db-ex">Staff and team</div>
+          <div class="db-ex">Systems and delivery</div>
+          <div class="db-ex">Quality standards</div>
+          <div class="db-ex">Day-to-day execution</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANY STAGE -->
+<section id="stages">
+  <div class="container">
+    <span class="s-label fu">Where You Are Right Now</span>
+    <h2 class="stages-intro fu">It doesn't matter where you're starting from.<br/><em>It matters that you can see clearly from here.</em></h2>
+    <p class="stages-sub fu">Cortex works for operators at every point in their journey — because the three domains never change, only the numbers inside them do.</p>
+    <div class="stages-grid">
+      <div class="stage-card fu">
+        <span class="stage-marker">PHASE 01</span>
+        <div class="stage-name">Building the foundation</div>
+        <div class="stage-pain">You're doing everything yourself. Revenue is coming in but the picture isn't clear yet. You need to know what's actually working before you scale anything.</div>
+        <div class="stage-quote">"I'm busy every day but I don't always know if I'm moving forward."</div>
+      </div>
+      <div class="stage-card fu">
+        <span class="stage-marker">PHASE 02</span>
+        <div class="stage-name">Growing with momentum</div>
+        <div class="stage-pain">Things are working. You've proved the concept. Now the complexity is growing and you need a system that matches the pace — before the cracks appear.</div>
+        <div class="stage-quote">"We're growing but I feel like I'm always one step behind the business."</div>
+      </div>
+      <div class="stage-card fu">
+        <span class="stage-marker">PHASE 03</span>
+        <div class="stage-name">Operating at scale</div>
+        <div class="stage-pain">You're established. Multiple moving parts. The risk now is something slipping in a domain you're not watching closely enough. At this level, blind spots are expensive.</div>
+        <div class="stage-quote">"I need to see the whole picture at once. Not just the part in front of me."</div>
+      </div>
+      <div class="stage-card fu">
+        <span class="stage-marker">PHASE 04</span>
+        <div class="stage-name">Running multiple ventures</div>
+        <div class="stage-pain">More than one business. Each one needs a clear eye. The mental load of keeping all three domains healthy across multiple operations is constant.</div>
+        <div class="stage-quote">"Everything is in my head. Which is fine until it isn't."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI ADVISOR -->
+<section id="advisor">
+  <div class="container">
+    <div class="advisor-inner">
+      <div>
+        <span class="advisor-lbl">The Intelligence Layer</span>
+        <h2 class="advisor-hl fu">An advisor who already<br/>read the brief.<br/><strong>And knows your industry.</strong></h2>
+        <p class="advisor-body fu">Most AI gives you the same answer it gives everyone. Cortex is different because it has read your goals, your weekly pulse, your specific challenges — and advises you on your actual situation. Like a sharp consultant who never forgets a number and is available at 2am when the decision can't wait.</p>
+        <div class="advisor-pts">
+          <div class="advisor-pt fu">
+            <div class="apt-icon">🎯</div>
+            <div class="apt-text"><strong>Industry-specific</strong>Knows the difference between a restaurant operation and a service business. Advises accordingly — not generically.</div>
+          </div>
+          <div class="advisor-pt fu">
+            <div class="apt-icon">📊</div>
+            <div class="apt-text"><strong>Goal and deadline aware</strong>Reads your active targets. Flags what's at risk before you have to ask. Tells you what move to make and why.</div>
+          </div>
+          <div class="advisor-pt fu">
+            <div class="apt-icon">🎙</div>
+            <div class="apt-text"><strong>Voice-enabled</strong>Think out loud, get sharp answers back. No typing required. The system captures ideas the moment they arrive.<br/><span style="color:var(--gold);opacity:0.85;">Speaks English, Spanish, Filipino and more.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-ui fu">
+        <div class="chat-head">
+          <div class="chat-av">🧠</div>
+          <div><div class="chat-nm">Cortex Advisor</div><div class="chat-st">● Knows your business · Always on</div></div>
+        </div>
+        <div class="chat-msgs">
+          <div class="cm u">My Finance domain went yellow. What should I look at first?</div>
+          <div class="cm a">Based on your current goals, the most urgent item is your Q3 cost target — 18 days out with the gap still open. I'd call the supplier today and lock in the revised terms. That single action closes most of it. Want me to walk through the other Finance goals?</div>
+          <div class="cm u">Which goal across all three domains is most at risk right now?</div>
+          <div class="cm a">Operations. Your staff review system is 11 days past its deadline with no movement. In a service business this kind of slip shows up in customer experience within 2–3 weeks. Treat this as today's priority — not next week's.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section id="benefits">
+  <div class="container">
+    <span class="s-label fu">The Impact</span>
+    <h2 class="s-hl fu"><strong>What changes</strong> when you can see clearly.</h2>
+    <div class="benefits-grid">
+      <div class="ben-card fu">
+        <div class="ben-stat">10×</div>
+        <div class="ben-name">Faster to see what's slipping</div>
+        <div class="ben-body">Instead of feeling something is off for weeks, you see it the moment a domain turns yellow. You act before it becomes a crisis.</div>
+      </div>
+      <div class="ben-card fu">
+        <div class="ben-stat">3</div>
+        <div class="ben-name">Domains watched at once</div>
+        <div class="ben-body">Growth. Finance. Operations. All three in one view. The domain you're not watching is always the one that causes the next problem.</div>
+      </div>
+      <div class="ben-card fu">
+        <div class="ben-stat">1</div>
+        <div class="ben-name">Clear focus every day</div>
+        <div class="ben-body">Every morning, one question. One answer. Not a list of 40 things. The single action that moves the needle today — identified for you.</div>
+      </div>
+      <div class="ben-card fu">
+        <div class="ben-stat">0</div>
+        <div class="ben-name">Good ideas lost in voice notes</div>
+        <div class="ben-body">Speak it or type it — the system captures it. Every insight, every decision, every goal. Nothing dies in a WhatsApp message to yourself again.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOOP CLOSE -->
+<section id="loop-close">
+  <div class="container">
+    <p class="loop-text fu">
+      We asked you three questions at the start.<br/>
+      When did you last know clearly which part of your business was winning?<br/>
+      When a problem surfaces — how long has it actually been there?<br/>
+      Is your energy going where your business needs it most?<br/><br/>
+      <strong>Now you have a system that answers all three.</strong><br/>
+      <em>Every morning. Before you do anything else.</em>
+    </p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <span class="s-label fu" style="text-align:center;display:block;">Private Access</span>
+    <h2 class="s-hl fu" style="text-align:center;"><strong>Not software you download.</strong><br/>A system built around you.</h2>
+    <div class="pricing-card fu">
+      <div class="pricing-badge">🔒 &nbsp; Private · By Invitation Only</div>
+      <div class="pricing-seats">This is not a public product. Access is offered privately to a small number of operators. If you received this page — you were already considered.</div>
+      <div><span class="p-cur">£</span><span class="p-amount">500</span></div>
+      <div class="p-lbl">One-time setup fee</div>
+      <div class="p-note">Full customisation for your specific business, industry and context</div>
+      <div class="p-divider"></div>
+      <div class="p-retainer">
+        <div>
+          <div class="p-ret-l">Monthly retainer</div>
+          <div class="p-ret-s">Ongoing support · Updates · AI maintenance</div>
+        </div>
+        <div class="p-ret-a">£200<span style="font-size:16px;color:#3A3028;">/mo</span></div>
+      </div>
+      <div class="p-items">
+        <div class="p-item"><span class="p-check">✓</span> Your own private Cortex — not shared with anyone</div>
+        <div class="p-item"><span class="p-check">✓</span> Three domains configured for your specific business</div>
+        <div class="p-item"><span class="p-check">✓</span> AI advisor trained on your industry and context</div>
+        <div class="p-item"><span class="p-check">✓</span> Onboarding built around how you actually operate</div>
+        <div class="p-item"><span class="p-check">✓</span> Deployed on your own private URL</div>
+        <div class="p-item"><span class="p-check">✓</span> Installs on your phone as a private app</div>
+        <div class="p-item"><span class="p-check">✓</span> Voice-enabled — speak your ideas and questions</div>
+        <div class="p-item"><span class="p-check">✓</span> New features added as the system evolves</div>
+        <div class="p-item"><span class="p-check">✓</span> Direct access — not a support queue</div>
+      </div>
+      <button onclick="openForm()" class="p-cta">Request Private Access →</button>
+      <div class="p-footer">Setup completed within 48 hours · 3-month minimum<br/>Cancel after that with 30 days notice</div>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESS FORM MODAL -->
+<div id="access-form-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;overflow-y:auto;padding:40px 20px;" onclick="if(event.target===this)closeForm()">
+<div style="max-width:560px;margin:0 auto;background:#FFFFFF;border-radius:20px;padding:48px 40px;position:relative;box-shadow:0 40px 80px rgba(0,0,0,0.3);">
+    <button onclick="closeForm()" style="position:absolute;top:16px;right:20px;background:none;border:none;font-size:24px;color:#B0A090;cursor:pointer;font-family:inherit;">×</button>
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="display:inline-block;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#B8841A;font-weight:700;background:rgba(184,132,26,0.06);border:1px solid rgba(184,132,26,0.18);border-radius:4px;padding:5px 12px;margin-bottom:16px;">Apply For Access</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:#1A1410;margin-bottom:8px;line-height:1.2;"><strong style="font-weight:700;">Tell us about<br/>your business.</strong></h2>
+      <p style="font-size:13px;color:#B0A090;">We'll be in touch within 24 hours. Every setup is personal.</p>
+    </div>
+    <div id="form-wrap">
+      <form id="cortex-form" style="display:flex;flex-direction:column;gap:16px;" onsubmit="handleSubmit(event)">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div>
+            <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">Full Name *</label>
+            <input type="text" name="name" required placeholder="Your name"
+              style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--dark);font-family:inherit;outline:none;transition:border-color 0.2s;"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <div>
+            <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">Email Address *</label>
+            <input type="email" name="email" required placeholder="your@email.com"
+              style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--dark);font-family:inherit;outline:none;transition:border-color 0.2s;"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">Business Name *</label>
+          <input type="text" name="business" required placeholder="What's your business called?"
+            style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--dark);font-family:inherit;outline:none;transition:border-color 0.2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+        </div>
+
+        <div>
+          <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">What does your business do? *</label>
+          <input type="text" name="what_you_do" required placeholder="e.g. Restaurant, property, agency, retail..."
+            style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--dark);font-family:inherit;outline:none;transition:border-color 0.2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+        </div>
+
+        <div>
+          <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">Where are you right now?</label>
+          <select name="stage"
+            style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--dark);font-family:inherit;outline:none;appearance:none;transition:border-color 0.2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+            <option value="" disabled selected>Select your stage</option>
+            <option value="phase1">Building the foundation — early days</option>
+            <option value="phase2">Growing with momentum — things are working</option>
+            <option value="phase3">Operating at scale — established business</option>
+            <option value="phase4">Running multiple ventures</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">What's your biggest challenge right now?</label>
+          <textarea name="challenge" rows="3" placeholder="Be as specific as you like — this helps us configure Cortex for your situation"
+            style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--dark);font-family:inherit;outline:none;resize:none;line-height:1.6;transition:border-color 0.2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        </div>
+
+        <div>
+          <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">Phone / WhatsApp (optional)</label>
+          <input type="tel" name="phone" placeholder="+44 7700 000000"
+            style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--dark);font-family:inherit;outline:none;transition:border-color 0.2s;"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+        </div>
+
+        <button type="submit" id="submit-btn"
+          style="width:100%;background:var(--gold);color:var(--white);border:none;border-radius:10px;padding:18px 32px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.2s;box-shadow:0 4px 20px rgba(184,132,26,0.25);margin-top:4px;"
+          onmouseover="this.style.background='var(--gold-lt)';this.style.transform='translateY(-1px)'"
+          onmouseout="this.style.background='var(--gold)';this.style.transform='translateY(0)'">
+          Submit Application →
+        </button>
+
+        <p style="font-size:11px;color:var(--text-muted);text-align:center;line-height:1.7;">
+          Your details are private. We will never share them.<br/>
+          We review every application personally and respond within 24 hours.
+        </p>
+      </form>
+
+      <!-- Success State -->
+      <div id="form-success" style="display:none;text-align:center;padding:48px 32px;">
+        <div style="font-size:48px;margin-bottom:20px;">✓</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:#1A1410;margin-bottom:12px;">Application received.</div>
+        <div style="font-size:15px;color:#8A7A62;line-height:1.8;max-width:380px;margin:0 auto 28px;">
+          Your details are saved. We'll review your application personally and be in touch within 24 hours.
+        </div>
+        <div style="font-size:12px;color:#B0A090;margin-bottom:24px;">hello@cortexsystem.vip</div>
+        <button onclick="closeForm()" style="background:#B8841A;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.06em;">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL CLOSE -->
+<section id="close">
+  <div class="container">
+    <h2 class="close-hl fu">
+      Your business is already running.<br/>
+      <em>The question is —</em><br/>
+      <strong>is it winning in all three?</strong>
+    </h2>
+    <p class="close-sub fu">Growth. Finance. Operations. Green, yellow, or red. Cortex shows you the full picture — every morning — so nothing slips, nothing hides, and you always know where to put your energy.</p>
+    <button onclick="openForm()" class="close-cta" style="border:none;cursor:pointer;">Request Private Access →</button>
+  </div>
+</section>
+
+<footer>
+  <div class="f-logo">CORTEX.</div>
+  <div class="f-note">Private · By invitation only · Not publicly available</div>
+</footer>
+
+<script>
+const SUPABASE_URL = "https://xwtmzkcvpjjfjbfgbjdt.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3dG16a2N2cGpqZmpiZmdiamR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1OTUwNzEsImV4cCI6MjA5NzE3MTA3MX0.1LQ8mIDBUy9WIFzA9lnsKpGsjQ6HTuVLCHjEq8YVu6c";
+
+function openForm() {
+  document.getElementById('access-form-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeForm() {
+  document.getElementById('access-form-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeForm(); });
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  const form = document.getElementById('cortex-form');
+  const data = new FormData(form);
+
+  const payload = {
+    name:       data.get('name')        || '',
+    email:      data.get('email')       || '',
+    business:   data.get('business')    || '',
+    what_you_do:data.get('what_you_do') || '',
+    stage:      data.get('stage')       || '',
+    challenge:  data.get('challenge')   || '',
+    phone:      data.get('phone')       || '',
+  };
+
+  // Validate
+  if (!payload.name || !payload.email || !payload.business) {
+    alert('Please fill in your name, email and business name.');
+    return;
+  }
+
+  // Loading state
+  btn.textContent = 'Submitting...';
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+
+  try {
+    // ── Save to Supabase ──
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/cortex_applications`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':         SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer':        'return=minimal',
+        'Accept':        'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Supabase error:', res.status, err);
+      throw new Error(err);
+    }
+
+    // ── Show success ──
+    form.style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+    btn.textContent = 'Submit Application →';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+
+  } catch (err) {
+    console.error('Supabase error:', err);
+    // Fallback — open mailto so you never lose a lead
+    const body = encodeURIComponent(
+      `CORTEX APPLICATION\n\nName: ${payload.name}\nEmail: ${payload.email}\nBusiness: ${payload.business}\nWhat they do: ${payload.what_you_do}\nStage: ${payload.stage}\nChallenge: ${payload.challenge}\nPhone: ${payload.phone || 'Not provided'}`
+    );
+    window.location.href = `mailto:hello@cortexsystem.vip?subject=Cortex Application — ${encodeURIComponent(payload.name)}&body=${body}`;
+
+    // Still show success to user
+    form.style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
