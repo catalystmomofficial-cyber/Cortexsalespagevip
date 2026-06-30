@@ -22,21 +22,61 @@
     text-align: center;
     padding: 24px;
   }
-  .wrap { max-width: 480px; }
+  .wrap {
+    max-width: 480px;
+    opacity: 0;
+    animation: rise 1.1s cubic-bezier(.16,1,.3,1) 0.15s forwards;
+  }
   .logo {
+    position: relative;
+    display: inline-block;
     font-family: 'Cormorant Garamond', serif;
     font-size: 40px;
     font-weight: 700;
-    letter-spacing: 0.1em;
-    color: #B8841A;
+    letter-spacing: 0.14em;
     margin-bottom: 24px;
+    background: linear-gradient(
+      100deg,
+      #8a6322 0%,
+      #8a6322 38%,
+      #f0d49c 48%,
+      #fff6e0 50%,
+      #f0d49c 52%,
+      #8a6322 62%,
+      #8a6322 100%
+    );
+    background-size: 260% 100%;
+    background-position: 100% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: sweep 4.5s ease-in-out 1.1s infinite;
   }
-  .logo em { color: #F7F3EE; font-style: normal; }
+  .logo em {
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    color: #F7F3EE;
+    font-style: normal;
+  }
   p {
     font-size: 15px;
     line-height: 1.7;
     color: rgba(247,243,238,0.65);
     font-weight: 300;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes sweep {
+    0%   { background-position: 130% 0; }
+    45%  { background-position: -30% 0; }
+    100% { background-position: -30% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wrap { opacity: 1; animation: none; }
+    .logo { animation: none; background-position: 0 0; }
   }
 </style>
 </head>
