@@ -525,9 +525,10 @@ footer {
 
   #access-form-modal { padding: 20px 10px !important; }
   #access-form-modal > div { padding: 32px 22px !important; border-radius: 16px !important; max-width: 100% !important; }
-  #cortex-form > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; gap: 16px !important; }
+  .f-row-2up { grid-template-columns: 1fr !important; gap: 16px !important; }
   #cortex-form input, #cortex-form select, #cortex-form textarea { font-size: 16px !important; }
 }
+.f-row-2up > div { min-width: 0; }
 
 @media (max-width: 420px) {
   nav { padding: 12px 16px; }
@@ -1022,7 +1023,7 @@ footer {
     <div id="form-wrap">
       <form id="cortex-form" style="display:flex;flex-direction:column;gap:16px;" onsubmit="handleSubmit(event)">
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="f-row-2up" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div>
             <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">Full Name *</label>
             <input type="text" name="name" required placeholder="Your name"
