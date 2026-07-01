@@ -19,7 +19,7 @@ body {
   padding: 60px 24px;
   min-height: 100vh;
 }
-h2 {
+.section-label {
   color: rgba(255,255,255,0.3);
   font-size: 11px;
   letter-spacing: 0.2em;
@@ -29,8 +29,25 @@ h2 {
   align-self: flex-start;
   margin-left: calc(50% - 350px);
 }
+.variant-divider {
+  width: 700px;
+  height: 1px;
+  background: rgba(184,132,26,0.12);
+  margin: 16px 0 0;
+}
+.variant-heading {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(184,132,26,0.45);
+  font-weight: 400;
+  align-self: flex-start;
+  margin-left: calc(50% - 350px);
+  margin-bottom: -32px;
+}
 @media (max-width: 760px) {
-  h2 { margin-left: 0; }
+  .section-label, .variant-heading { margin-left: 0; }
+  .variant-divider { width: 100%; }
 }
 
 /* ── CARD BASE ── */
@@ -46,7 +63,7 @@ h2 {
   .card { width: 100%; height: auto; aspect-ratio: 7/4; }
 }
 
-/* ── FRONT ── */
+/* ── FRONT (Classic) ── */
 .front {
   background: #1A1410;
   display: flex;
@@ -54,8 +71,6 @@ h2 {
   justify-content: space-between;
   padding: 52px 60px;
 }
-
-/* glare sweep */
 .front::before {
   content: '';
   position: absolute;
@@ -74,7 +89,6 @@ h2 {
   transform: skewX(-15deg);
   pointer-events: none;
 }
-/* subtle grain texture overlay */
 .front::after {
   content: '';
   position: absolute;
@@ -83,7 +97,6 @@ h2 {
   opacity: 0.4;
   pointer-events: none;
 }
-
 .front-top { position: relative; z-index: 1; }
 .front-bottom { position: relative; z-index: 1; }
 
@@ -112,7 +125,6 @@ h2 {
   -webkit-text-fill-color: rgba(247,243,238,0.7);
   font-style: normal;
 }
-
 .tagline {
   margin-top: 10px;
   font-size: 11px;
@@ -121,7 +133,6 @@ h2 {
   color: rgba(247,243,238,0.35);
   font-weight: 300;
 }
-
 .rule {
   width: 36px;
   height: 1px;
@@ -136,7 +147,7 @@ h2 {
   font-weight: 400;
 }
 
-/* ── BACK ── */
+/* ── BACK (Classic) ── */
 .back {
   background: #1A1410;
   display: flex;
@@ -152,10 +163,8 @@ h2 {
   background: radial-gradient(ellipse at 30% 50%, rgba(184,132,26,0.07) 0%, transparent 65%);
   pointer-events: none;
 }
-
 .back-left { position: relative; z-index: 1; }
 .back-right { position: relative; z-index: 1; }
-
 .back-wordmark {
   font-family: 'Cormorant Garamond', serif;
   font-size: 28px;
@@ -165,39 +174,149 @@ h2 {
   margin-bottom: 6px;
 }
 .back-wordmark em { color: rgba(247,243,238,0.6); font-style: normal; }
-
 .back-tagline {
   font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(247,243,238,0.28);
   font-weight: 300;
-  margin-bottom: 28px;
 }
-.back-invite {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(184,132,26,0.7);
-  font-weight: 400;
-  margin-bottom: 6px;
-}
-.back-url {
-  font-size: 12px;
-  color: rgba(247,243,238,0.4);
-  font-weight: 300;
-  letter-spacing: 0.04em;
-}
-
 .qr-wrap {
   background: #F7F3EE;
   border-radius: 12px;
   padding: 14px;
   display: inline-flex;
 }
-#qrcode canvas, #qrcode img {
-  display: block;
-  border-radius: 4px;
+#qrcode canvas, #qrcode img { display: block; border-radius: 4px; }
+#qrcode2 canvas, #qrcode2 img { display: block; border-radius: 4px; }
+
+/* ── HOLOGRAPHIC FRONT ── */
+.holo-front {
+  background: #1A1410;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 52px 60px;
+  text-align: center;
+}
+.holo-front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.holo-wordmark {
+  position: relative;
+  z-index: 1;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 72px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  background: linear-gradient(
+    100deg,
+    #8a6322 0%,
+    #8a6322 38%,
+    #f0d49c 48%,
+    #fff6e0 50%,
+    #f0d49c 52%,
+    #8a6322 62%,
+    #8a6322 100%
+  );
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: holo-sweep 4.5s ease-in-out 0.3s infinite;
+}
+.holo-wordmark em {
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  color: rgba(247,243,238,0.7);
+  -webkit-text-fill-color: rgba(247,243,238,0.7);
+  font-style: normal;
+}
+
+@keyframes holo-sweep {
+  0%   { background-position: 130% 0; }
+  45%  { background-position: -30% 0; }
+  100% { background-position: -30% 0; }
+}
+
+.holo-body {
+  position: relative;
+  z-index: 1;
+  margin-top: 20px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(247,243,238,0.4);
+  font-weight: 300;
+  line-height: 2;
+}
+
+/* ── HOLOGRAPHIC BACK ── */
+.holo-back {
+  background: #1A1410;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 64px;
+  padding: 52px 60px;
+}
+.holo-back::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 70% 50%, rgba(184,132,26,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+.holo-back-left { position: relative; z-index: 1; }
+.holo-back-right { position: relative; z-index: 1; }
+
+.holo-back-wordmark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  background: linear-gradient(
+    100deg,
+    #8a6322 0%,
+    #8a6322 38%,
+    #f0d49c 48%,
+    #fff6e0 50%,
+    #f0d49c 52%,
+    #8a6322 62%,
+    #8a6322 100%
+  );
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: holo-sweep 4.5s ease-in-out 0.3s infinite;
+  margin-bottom: 6px;
+}
+.holo-back-wordmark em {
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  color: rgba(247,243,238,0.6);
+  -webkit-text-fill-color: rgba(247,243,238,0.6);
+  font-style: normal;
+}
+.holo-back-tagline {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247,243,238,0.28);
+  font-weight: 300;
 }
 
 /* ── DOWNLOAD BUTTONS ── */
@@ -238,12 +357,18 @@ h2 {
   line-height: 1.8;
 }
 .note strong { color: rgba(255,255,255,0.45); font-weight: 500; }
+
+@media (prefers-reduced-motion: reduce) {
+  .holo-wordmark, .holo-back-wordmark { animation: none; background-position: 0 0; }
+}
 </style>
 </head>
 <body>
 
-<h2>Front</h2>
+<!-- ── CLASSIC VARIANT ── -->
+<div class="variant-heading">Option A — Classic</div>
 
+<p class="section-label" style="margin-bottom:-24px; margin-top:8px;">Front</p>
 <div class="card front">
   <div class="front-top">
     <div class="wordmark">CORTEX<em>.</em></div>
@@ -255,14 +380,11 @@ h2 {
   </div>
 </div>
 
-<h2>Back</h2>
-
+<p class="section-label">Back</p>
 <div class="card back">
   <div class="back-left">
     <div class="back-wordmark">CORTEX<em>.</em></div>
     <div class="back-tagline">Private Business Operating System</div>
-    <div class="back-invite">Request Consideration</div>
-    <div class="back-url">cortexsystem.vip/apply</div>
   </div>
   <div class="back-right">
     <div class="qr-wrap">
@@ -272,28 +394,81 @@ h2 {
 </div>
 
 <div class="dl-row">
-  <button class="dl-btn gold" onclick="downloadCard('front')">
+  <button class="dl-btn gold" onclick="downloadCard('.card.front', 'cortex-classic-front')">
     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 16l7 7 7-7"/><path d="M3 21h18"/></svg>
     Download Front
   </button>
-  <button class="dl-btn outline" onclick="downloadCard('back')">
+  <button class="dl-btn outline" onclick="downloadCard('.card.back', 'cortex-classic-back')">
     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 16l7 7 7-7"/><path d="M3 21h18"/></svg>
     Download Back
   </button>
-  <button class="dl-btn outline" onclick="downloadBoth()">
+  <button class="dl-btn outline" onclick="downloadBoth('.card.front', '.card.back', 'cortex-classic')">
     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 16l7 7 7-7"/><path d="M3 21h18"/></svg>
     Download Both
   </button>
 </div>
 
 <p class="note">
-  Downloads as PNG — upload directly to Canva as image reference.<br/>
   Standard business card: 3.5" × 2" canvas size.<br/>
   Print recommendation: <strong>Matte black stock · Gold foil on the wordmark.</strong>
 </p>
 
+<div class="variant-divider"></div>
+
+<!-- ── HOLOGRAPHIC VARIANT ── -->
+<div class="variant-heading">Option B — Holographic</div>
+
+<p class="section-label" style="margin-bottom:-24px; margin-top:8px;">Front</p>
+<div class="card holo-front">
+  <div class="holo-wordmark">CORTEX<em>.</em></div>
+  <div class="holo-body">
+    Private Business Operating System<br/>By invitation only.
+  </div>
+</div>
+
+<p class="section-label">Back</p>
+<div class="card holo-back">
+  <div class="holo-back-left">
+    <div class="holo-back-wordmark">CORTEX<em>.</em></div>
+    <div class="holo-back-tagline">Private Business Operating System</div>
+  </div>
+  <div class="holo-back-right">
+    <div class="qr-wrap">
+      <div id="qrcode2"></div>
+    </div>
+  </div>
+</div>
+
+<div class="dl-row">
+  <button class="dl-btn gold" onclick="downloadCard('.card.holo-front', 'cortex-holo-front')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 16l7 7 7-7"/><path d="M3 21h18"/></svg>
+    Download Front
+  </button>
+  <button class="dl-btn outline" onclick="downloadCard('.card.holo-back', 'cortex-holo-back')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 16l7 7 7-7"/><path d="M3 21h18"/></svg>
+    Download Back
+  </button>
+  <button class="dl-btn outline" onclick="downloadBoth('.card.holo-front', '.card.holo-back', 'cortex-holo')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 16l7 7 7-7"/><path d="M3 21h18"/></svg>
+    Download Both
+  </button>
+</div>
+
+<p class="note">
+  Standard business card: 3.5" × 2" canvas size.<br/>
+  Print recommendation: <strong>Holographic foil stock · The sweep effect maps directly to the foil movement.</strong>
+</p>
+
 <script>
 new QRCode(document.getElementById('qrcode'), {
+  text: 'https://www.cortexsystem.vip/apply',
+  width: 140,
+  height: 140,
+  colorDark: '#1A1410',
+  colorLight: '#F7F3EE',
+  correctLevel: QRCode.CorrectLevel.H
+});
+new QRCode(document.getElementById('qrcode2'), {
   text: 'https://www.cortexsystem.vip/apply',
   width: 140,
   height: 140,
@@ -315,28 +490,27 @@ async function captureCard(selector) {
 
 function triggerDownload(canvas, filename) {
   const link = document.createElement('a');
-  link.download = filename;
+  link.download = filename + '.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
 
-async function downloadCard(side) {
+async function downloadCard(selector, filename) {
   const btns = document.querySelectorAll('.dl-btn');
   btns.forEach(b => b.disabled = true);
-  const selector = side === 'front' ? '.card.front' : '.card.back';
   const canvas = await captureCard(selector);
-  triggerDownload(canvas, 'cortex-card-' + side + '.png');
+  triggerDownload(canvas, filename);
   btns.forEach(b => b.disabled = false);
 }
 
-async function downloadBoth() {
+async function downloadBoth(frontSel, backSel, prefix) {
   const btns = document.querySelectorAll('.dl-btn');
   btns.forEach(b => b.disabled = true);
-  const front = await captureCard('.card.front');
-  triggerDownload(front, 'cortex-card-front.png');
+  const front = await captureCard(frontSel);
+  triggerDownload(front, prefix + '-front');
   await new Promise(r => setTimeout(r, 400));
-  const back = await captureCard('.card.back');
-  triggerDownload(back, 'cortex-card-back.png');
+  const back = await captureCard(backSel);
+  triggerDownload(back, prefix + '-back');
   btns.forEach(b => b.disabled = false);
 }
 </script>
