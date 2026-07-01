@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/access", "destination": "/cortex-sales-page.html" }
+    { "source": "/access", "destination": "/cortex-sales-page.html" },
+    { "source": "/apply", "destination": "/apply.html" }
   ]
 }
