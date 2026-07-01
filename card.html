@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cortex — Business Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #111;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  padding: 60px 24px;
+  min-height: 100vh;
+}
+h2 {
+  color: rgba(255,255,255,0.3);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 400;
+  margin-bottom: -32px;
+  align-self: flex-start;
+  margin-left: calc(50% - 350px);
+}
+@media (max-width: 760px) {
+  h2 { margin-left: 0; }
+}
+
+/* ── CARD BASE ── */
+.card {
+  width: 700px;
+  height: 400px;
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(184,132,26,0.15);
+}
+@media (max-width: 760px) {
+  .card { width: 100%; height: auto; aspect-ratio: 7/4; }
+}
+
+/* ── FRONT ── */
+.front {
+  background: #1A1410;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 52px 60px;
+}
+
+/* glare sweep */
+.front::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -40%;
+  width: 80%;
+  height: 200%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(184,132,26,0.06) 50%,
+    rgba(255,240,180,0.10) 52%,
+    rgba(184,132,26,0.06) 54%,
+    transparent 65%
+  );
+  transform: skewX(-15deg);
+  pointer-events: none;
+}
+/* subtle grain texture overlay */
+.front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.front-top { position: relative; z-index: 1; }
+.front-bottom { position: relative; z-index: 1; }
+
+.wordmark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  background: linear-gradient(
+    100deg,
+    #8a6322 0%,
+    #8a6322 30%,
+    #f0d49c 45%,
+    #fff6e0 50%,
+    #f0d49c 55%,
+    #8a6322 70%,
+    #8a6322 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.wordmark em {
+  color: rgba(247,243,238,0.7);
+  -webkit-text-fill-color: rgba(247,243,238,0.7);
+  font-style: normal;
+}
+
+.tagline {
+  margin-top: 10px;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(247,243,238,0.35);
+  font-weight: 300;
+}
+
+.rule {
+  width: 36px;
+  height: 1px;
+  background: rgba(184,132,26,0.4);
+  margin-bottom: 14px;
+}
+.bottom-label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(184,132,26,0.6);
+  font-weight: 400;
+}
+
+/* ── BACK ── */
+.back {
+  background: #1A1410;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 64px;
+  padding: 52px 60px;
+}
+.back::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(184,132,26,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.back-left { position: relative; z-index: 1; }
+.back-right { position: relative; z-index: 1; }
+
+.back-wordmark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #B8841A;
+  margin-bottom: 6px;
+}
+.back-wordmark em { color: rgba(247,243,238,0.6); font-style: normal; }
+
+.back-tagline {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247,243,238,0.28);
+  font-weight: 300;
+  margin-bottom: 28px;
+}
+.back-invite {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(184,132,26,0.7);
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+.back-url {
+  font-size: 12px;
+  color: rgba(247,243,238,0.4);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+}
+
+.qr-wrap {
+  background: #F7F3EE;
+  border-radius: 12px;
+  padding: 14px;
+  display: inline-flex;
+}
+#qrcode canvas, #qrcode img {
+  display: block;
+  border-radius: 4px;
+}
+
+/* ── PRINT NOTE ── */
+.note {
+  color: rgba(255,255,255,0.25);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  line-height: 1.8;
+}
+.note strong { color: rgba(255,255,255,0.45); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<h2>Front</h2>
+
+<div class="card front">
+  <div class="front-top">
+    <div class="wordmark">CORTEX<em>.</em></div>
+    <div class="tagline">Private Business Operating System</div>
+  </div>
+  <div class="front-bottom">
+    <div class="rule"></div>
+    <div class="bottom-label">By Invitation Only</div>
+  </div>
+</div>
+
+<h2>Back</h2>
+
+<div class="card back">
+  <div class="back-left">
+    <div class="back-wordmark">CORTEX<em>.</em></div>
+    <div class="back-tagline">Private Business Operating System</div>
+    <div class="back-invite">Request Consideration</div>
+    <div class="back-url">cortexsystem.vip/apply</div>
+  </div>
+  <div class="back-right">
+    <div class="qr-wrap">
+      <div id="qrcode"></div>
+    </div>
+  </div>
+</div>
+
+<p class="note">
+  <strong>To use in Canva:</strong> Screenshot each card above, then upload as an image reference.<br/>
+  Standard business card size: 3.5" × 2" — set your Canva canvas to that size and match the layout.<br/>
+  Print finish recommendation: <strong>Matte black with gold foil on the wordmark.</strong>
+</p>
+
+<script>
+new QRCode(document.getElementById('qrcode'), {
+  text: 'https://www.cortexsystem.vip/apply',
+  width: 140,
+  height: 140,
+  colorDark: '#1A1410',
+  colorLight: '#F7F3EE',
+  correctLevel: QRCode.CorrectLevel.H
+});
+</script>
+</body>
+</html>
