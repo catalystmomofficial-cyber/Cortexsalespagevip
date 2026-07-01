@@ -6,6 +6,7 @@
 <title>Cortex — Business Card</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -199,6 +200,35 @@ h2 {
   border-radius: 4px;
 }
 
+/* ── DOWNLOAD BUTTONS ── */
+.dl-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.dl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.dl-btn:active { transform: scale(0.97); }
+.dl-btn.gold { background: #B8841A; color: #1A1410; }
+.dl-btn.outline { background: transparent; color: rgba(247,243,238,0.6); border: 1px solid rgba(184,132,26,0.3); }
+.dl-btn:hover { opacity: 0.82; }
+.dl-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.dl-btn svg { flex-shrink: 0; }
+
 /* ── PRINT NOTE ── */
 .note {
   color: rgba(255,255,255,0.25);
@@ -241,10 +271,25 @@ h2 {
   </div>
 </div>
 
+<div class="dl-row">
+  <button class="dl-btn gold" onclick="downloadCard('front')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 16l7 7 7-7"/><path d="M3 21h18"/></svg>
+    Download Front
+  </button>
+  <button class="dl-btn outline" onclick="downloadCard('back')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 16l7 7 7-7"/><path d="M3 21h18"/></svg>
+    Download Back
+  </button>
+  <button class="dl-btn outline" onclick="downloadBoth()">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 16l7 7 7-7"/><path d="M3 21h18"/></svg>
+    Download Both
+  </button>
+</div>
+
 <p class="note">
-  <strong>To use in Canva:</strong> Screenshot each card above, then upload as an image reference.<br/>
-  Standard business card size: 3.5" × 2" — set your Canva canvas to that size and match the layout.<br/>
-  Print finish recommendation: <strong>Matte black with gold foil on the wordmark.</strong>
+  Downloads as PNG — upload directly to Canva as image reference.<br/>
+  Standard business card: 3.5" × 2" canvas size.<br/>
+  Print recommendation: <strong>Matte black stock · Gold foil on the wordmark.</strong>
 </p>
 
 <script>
@@ -256,6 +301,44 @@ new QRCode(document.getElementById('qrcode'), {
   colorLight: '#F7F3EE',
   correctLevel: QRCode.CorrectLevel.H
 });
+
+async function captureCard(selector) {
+  const el = document.querySelector(selector);
+  const canvas = await html2canvas(el, {
+    scale: 3,
+    useCORS: true,
+    backgroundColor: null,
+    logging: false
+  });
+  return canvas;
+}
+
+function triggerDownload(canvas, filename) {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+async function downloadCard(side) {
+  const btns = document.querySelectorAll('.dl-btn');
+  btns.forEach(b => b.disabled = true);
+  const selector = side === 'front' ? '.card.front' : '.card.back';
+  const canvas = await captureCard(selector);
+  triggerDownload(canvas, 'cortex-card-' + side + '.png');
+  btns.forEach(b => b.disabled = false);
+}
+
+async function downloadBoth() {
+  const btns = document.querySelectorAll('.dl-btn');
+  btns.forEach(b => b.disabled = true);
+  const front = await captureCard('.card.front');
+  triggerDownload(front, 'cortex-card-front.png');
+  await new Promise(r => setTimeout(r, 400));
+  const back = await captureCard('.card.back');
+  triggerDownload(back, 'cortex-card-back.png');
+  btns.forEach(b => b.disabled = false);
+}
 </script>
 </body>
 </html>
