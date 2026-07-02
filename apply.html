@@ -308,15 +308,9 @@ document.getElementById('apply-form').addEventListener('submit', async function(
   btn.textContent = 'Submitting…';
 
   const payload = {
-    full_name:          document.getElementById('name').value.trim(),
-    email:              document.getElementById('email').value.trim(),
-    business_description: document.getElementById('business').value.trim(),
-    years_in_business:  document.getElementById('years').value,
-    team_size:          document.getElementById('team').value,
-    biggest_challenge:  document.getElementById('challenge').value.trim(),
-    why_cortex:         document.getElementById('why').value.trim(),
-    approval_status:    'pending',
-    submitted_at:       new Date().toISOString()
+    name: document.getElementById('name').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    stage: `${document.getElementById('years').value || 'unknown'} • ${document.getElementById('team').value || 'unknown'}`,
   };
 
   try {
@@ -332,28 +326,32 @@ document.getElementById('apply-form').addEventListener('submit', async function(
       body: JSON.stringify(payload)
     });
 
-    if (res.ok || res.status === 201) {
-      document.getElementById('apply-form').style.display = 'none';
-      const s = document.getElementById('success-msg');
-      s.querySelector('.success-title').textContent = 'Application Under Consideration.';
-      s.querySelector('.success-body').textContent = 'Your submission is now under consideration. If there is a fit, we will be in touch directly.';
-      s.style.display = 'block';
-      s.style.opacity = '0';
-      s.style.transform = 'translateY(12px)';
-      s.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        s.style.opacity = '1';
-        s.style.transform = 'translateY(0)';
-      }));
-    } else {
-      throw new Error('Server error');
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('Supabase response status:', res.status, errorText);
+      throw new Error(errorText || `Server error: ${res.status}`);
     }
+
+    document.getElementById('apply-form').style.display = 'none';
+    const s = document.getElementById('success-msg');
+    s.querySelector('.success-title').textContent = 'Application Under Consideration.';
+    s.querySelector('.success-body').textContent = 'Your submission is now under consideration. If there is a fit, we will be in touch directly.';
+    s.style.display = 'block';
+    s.style.opacity = '0';
+    s.style.transform = 'translateY(12px)';
+    s.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      s.style.opacity = '1';
+      s.style.transform = 'translateY(0)';
+    }));
   } catch(err) {
     btn.disabled = false;
     btn.textContent = 'Submit Application';
     console.error('Apply form error:', err);
     if (err.message && err.message.includes('Supabase configuration missing')) {
       alert(err.message);
+    } else if (err.message) {
+      alert('Something went wrong. ' + err.message);
     } else {
       alert('Something went wrong. Please try again.');
     }
