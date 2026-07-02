@@ -1057,7 +1057,7 @@ footer {
 
         <div>
           <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">Where are you right now?</label>
-          <select name="stage"
+          <select name="business_stage"
             style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--dark);font-family:inherit;outline:none;appearance:none;transition:border-color 0.2s;"
             onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
             <option value="" disabled selected>Select your stage</option>
@@ -1069,15 +1069,8 @@ footer {
         </div>
 
         <div>
-          <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">What's your biggest challenge right now?</label>
-          <textarea name="challenge" rows="3" placeholder="Be as specific as you like — this helps us configure Cortex for your situation"
-            style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--dark);font-family:inherit;outline:none;resize:none;line-height:1.6;transition:border-color 0.2s;"
-            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-        </div>
-
-        <div>
           <label style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B8841A;font-weight:700;display:block;margin-bottom:6px;">Phone / WhatsApp (optional)</label>
-          <input type="tel" name="phone" placeholder="+44 7700 000000"
+          <input type="tel" name="phone_whatsapp" placeholder="+44 7700 000000"
             style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--dark);font-family:inherit;outline:none;transition:border-color 0.2s;"
             onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
         </div>
@@ -1127,8 +1120,8 @@ footer {
 </footer>
 
 <script>
-const SUPABASE_URL = "https://xwtmzkcvpjjfjbfgbjdt.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3dG16a2N2cGpqZmpiZmdiamR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1OTUwNzEsImV4cCI6MjA5NzE3MTA3MX0.1LQ8mIDBUy9WIFzA9lnsKpGsjQ6HTuVLCHjEq8YVu6c";
+const SUPABASE_URL = (typeof window !== 'undefined' && window.NEXT_PUBLIC_SUPABASE_URL) || (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_SUPABASE_URL) || "https://xwtmzkcvpjjfjbfgbjdt.supabase.co";
+const SUPABASE_KEY = (typeof window !== 'undefined' && window.NEXT_PUBLIC_SUPABASE_ANON_KEY) || (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3dG16a2N2cGpqZmpiZmdiamR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1OTUwNzEsImV4cCI6MjA5NzE3MTA3MX0.1LQ8mIDBUy9WIFzA9lnsKpGsjQ6HTuVLCHjEq8YVu6c";
 
 function openForm() {
   document.getElementById('access-form-modal').style.display = 'block';
@@ -1174,17 +1167,17 @@ async function handleSubmit(e) {
   const data = new FormData(form);
 
   const payload = {
-    name:       data.get('name')        || '',
-    email:      data.get('email')       || '',
-    business:   data.get('business')    || '',
-    what_you_do:data.get('what_you_do') || '',
-    stage:      data.get('stage')       || '',
-    challenge:  data.get('challenge')   || '',
-    phone:      data.get('phone')       || '',
+    name:            data.get('name')           || '',
+    email:           data.get('email')          || '',
+    business_name:   data.get('business')       || '',
+    business_description: data.get('what_you_do') || '',
+    business_stage:  data.get('business_stage') || '',
+    phone_whatsapp:  data.get('phone_whatsapp') || '',
+    approval_status: 'pending',
   };
 
   // Validate
-  if (!payload.name || !payload.email || !payload.business) {
+  if (!payload.name || !payload.email || !payload.business_name) {
     alert('Please fill in your name, email and business name.');
     return;
   }
@@ -1195,15 +1188,14 @@ async function handleSubmit(e) {
   btn.disabled = true;
 
   try {
-    // ── Save to Supabase ──
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/cortex_applications`, {
+    // ── Save to Supabase (upsert by email) ──
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/cortex_applications?on_conflict=email`, {
       method: 'POST',
       headers: {
         'Content-Type':  'application/json',
         'apikey':         SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Prefer':        'return=minimal',
-        'Accept':        'application/json',
+        'Prefer':        'resolution=merge-duplicates,return=minimal',
       },
       body: JSON.stringify(payload),
     });
@@ -1225,7 +1217,7 @@ async function handleSubmit(e) {
     console.error('Supabase error:', err);
     // Fallback — open mailto so you never lose a lead
     const body = encodeURIComponent(
-      `CORTEX APPLICATION\n\nName: ${payload.name}\nEmail: ${payload.email}\nBusiness: ${payload.business}\nWhat they do: ${payload.what_you_do}\nStage: ${payload.stage}\nChallenge: ${payload.challenge}\nPhone: ${payload.phone || 'Not provided'}`
+      `CORTEX APPLICATION\n\nName: ${payload.name}\nEmail: ${payload.email}\nBusiness Name: ${payload.business_name}\nBusiness Description: ${payload.business_description}\nStage: ${payload.business_stage}\nPhone / WhatsApp: ${payload.phone_whatsapp || 'Not provided'}`
     );
     window.location.href = `mailto:hello@cortexsystem.vip?subject=Cortex Application — ${encodeURIComponent(payload.name)}&body=${body}`;
 

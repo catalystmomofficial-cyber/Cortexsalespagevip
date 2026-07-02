@@ -285,8 +285,8 @@ textarea { resize: vertical; min-height: 96px; line-height: 1.65; }
 </div>
 
 <script>
-const SUPABASE_URL = 'https://fjllcutxkbdbaprqkrib.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqbGxjdXR4a2JkYmFwcnFrcmliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzI2ODgsImV4cCI6MjA2NDU0ODY4OH0.4EWSB6VGpREUjSGMZKJgPY1_biEFskmJFKv5p_mNK7M';
+const SUPABASE_URL = (typeof window !== 'undefined' && window.NEXT_PUBLIC_SUPABASE_URL) || (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_SUPABASE_URL) || 'https://fjllcutxkbdbaprqkrib.supabase.co';
+const SUPABASE_KEY = (typeof window !== 'undefined' && window.NEXT_PUBLIC_SUPABASE_ANON_KEY) || (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqbGxjdXR4a2JkYmFwcnFrcmliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzI2ODgsImV4cCI6MjA2NDU0ODY4OH0.4EWSB6VGpREUjSGMZKJgPY1_biEFskmJFKv5p_mNK7M';
 
 document.getElementById('apply-form').addEventListener('submit', async function(e) {
   e.preventDefault();
@@ -295,14 +295,15 @@ document.getElementById('apply-form').addEventListener('submit', async function(
   btn.textContent = 'Submitting…';
 
   const payload = {
-    name:              document.getElementById('name').value.trim(),
-    email:             document.getElementById('email').value.trim(),
-    business:          document.getElementById('business').value.trim(),
-    years_in_business: document.getElementById('years').value,
-    team_size:         document.getElementById('team').value,
-    challenge:         document.getElementById('challenge').value.trim(),
-    why_cortex:        document.getElementById('why').value.trim(),
-    submitted_at:      new Date().toISOString()
+    full_name:          document.getElementById('name').value.trim(),
+    email:              document.getElementById('email').value.trim(),
+    business_description: document.getElementById('business').value.trim(),
+    years_in_business:  document.getElementById('years').value,
+    team_size:          document.getElementById('team').value,
+    biggest_challenge:  document.getElementById('challenge').value.trim(),
+    why_cortex:         document.getElementById('why').value.trim(),
+    approval_status:    'pending',
+    submitted_at:       new Date().toISOString()
   };
 
   try {
@@ -320,6 +321,8 @@ document.getElementById('apply-form').addEventListener('submit', async function(
     if (res.ok || res.status === 201) {
       document.getElementById('apply-form').style.display = 'none';
       const s = document.getElementById('success-msg');
+      s.querySelector('.success-title').textContent = 'Application Under Consideration.';
+      s.querySelector('.success-body').textContent = 'Your submission is now under consideration. If there is a fit, we will be in touch directly.';
       s.style.display = 'block';
       s.style.opacity = '0';
       s.style.transform = 'translateY(12px)';

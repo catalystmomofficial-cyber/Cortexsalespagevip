@@ -1,8 +1,6 @@
 # Public Identity Definition for AI Scrapers and Search Crawlers
 User-agent: *
 Allow: /
-Disallow: /access
-Disallow: /cortex-sales-page.html
 Disallow: /subdomains/
 Disallow: /app/
 
