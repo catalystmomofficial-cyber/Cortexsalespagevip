@@ -578,7 +578,7 @@ async function capture(el) {
   // 1. Deep-clone the card
   const clone = el.cloneNode(true);
   clone.style.cssText = [
-    'position:fixed', 'top:-9999px', 'left:0',
+    'position:fixed', 'top:0', 'left:-9999px',
     `width:${rect.width}px`, `height:${rect.height}px`,
     'overflow:hidden', 'border-radius:24px', 'z-index:-1'
   ].join(';');
@@ -647,6 +647,7 @@ function download(canvas, name) {
   a.click();
 }
 
+/* onclick="dlCard(...)" needs dlCard on window — const/let are NOT global */
 function withBtns(fn) {
   return async function(...args) {
     const btns = document.querySelectorAll('.dl-btn');
@@ -655,25 +656,25 @@ function withBtns(fn) {
   };
 }
 
-const dlCard = withBtns(async (sel, name) => {
+window.dlCard = withBtns(async (sel, name) => {
   download(await capture(document.querySelector(sel)), name);
 });
 
-const dlBoth = withBtns(async (selA, selB, prefix) => {
+window.dlBoth = withBtns(async (selA, selB, prefix) => {
   download(await capture(document.querySelector(selA)), prefix + '-front');
   await new Promise(r => setTimeout(r, 300));
   download(await capture(document.querySelector(selB)), prefix + '-back');
 });
 
-const dlHoloFront = withBtns(async () => {
+window.dlHoloFront = withBtns(async () => {
   download(await capture(document.getElementById('holo-front-card')), 'cortex-holo-front');
 });
 
-const dlHoloBack = withBtns(async () => {
+window.dlHoloBack = withBtns(async () => {
   download(await capture(document.getElementById('holo-back-card')), 'cortex-holo-back');
 });
 
-const dlHoloBoth = withBtns(async () => {
+window.dlHoloBoth = withBtns(async () => {
   download(await capture(document.getElementById('holo-front-card')), 'cortex-holo-front');
   await new Promise(r => setTimeout(r, 300));
   download(await capture(document.getElementById('holo-back-card')), 'cortex-holo-back');
