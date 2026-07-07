@@ -6,7 +6,6 @@
 <title>Cortex — Business Cards</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -371,29 +370,6 @@ body {
   .holo-wordmark, .holo-back-wordmark { animation: none; background-position: 0 0; }
 }
 
-/* ── FROZEN variants used only in the off-screen clone during PNG capture.
-   No gradient, no background-clip, just solid gold. html2canvas can paint these. ── */
-.wm-frozen-52 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 52px; font-weight: 700; letter-spacing: 0.12em; line-height: 1;
-  color: #B8841A; -webkit-text-fill-color: #B8841A;
-}
-.wm-frozen-72 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 72px; font-weight: 700; letter-spacing: 0.14em; line-height: 1;
-  color: #B8841A; -webkit-text-fill-color: #B8841A;
-  position: relative; z-index: 1;
-}
-.wm-frozen-28 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 28px; font-weight: 700; letter-spacing: 0.12em;
-  color: #B8841A; -webkit-text-fill-color: #B8841A; margin-bottom: 6px;
-}
-.wm-frozen-52 em, .wm-frozen-72 em, .wm-frozen-28 em {
-  color: rgba(247,243,238,0.7); -webkit-text-fill-color: rgba(247,243,238,0.7); font-style: normal;
-}
-/* Clone used during PNG capture — strip pseudo-elements that break html2canvas */
-.capture-clone::before, .capture-clone::after { display: none !important; }
 </style>
 </head>
 <body>
@@ -560,90 +536,120 @@ new QRCode(document.getElementById('qrcode2'), {
 });
 setTimeout(() => qrToImg('qrcode2'), 200);
 
-/* ── CAPTURE: clone the card, replace gradient wordmark classes with frozen solid-color
-   versions, manually stamp QR codes, then html2canvas the clone off-screen.
-   The live card is never touched so the animation keeps running. ── */
+/* ── CAPTURE: draw cards to canvas using the 2D API directly.
+   Reads element positions from getBoundingClientRect() on the live DOM.
+   No html2canvas — zero library bugs, zero CSS interpretation failures. ── */
 
-const SCALE = 3;
+const GOLD       = '#B8841A';
+const CREAM_DIM  = 'rgba(247,243,238,0.7)';
+const SCALE      = 3;
 
-// Map: original class → frozen class (size-matched, no background-clip tricks)
-const WM_FREEZE_MAP = {
-  'wordmark':           'wm-frozen-52',
-  'holo-wordmark':      'wm-frozen-72',
-  'holo-back-wordmark': 'wm-frozen-28',
-  'back-wordmark':      'wm-frozen-28'
-};
+async function capture(rootEl) {
+  await document.fonts.ready;
 
-async function capture(el) {
-  const rect = el.getBoundingClientRect();
+  const rootRect = rootEl.getBoundingClientRect();
+  const W = Math.round(rootRect.width);
+  const H = Math.round(rootRect.height);
 
-  // 1. Deep-clone the card
-  const clone = el.cloneNode(true);
-  clone.style.cssText = [
-    'position:fixed', 'top:0', 'left:-9999px',
-    `width:${rect.width}px`, `height:${rect.height}px`,
-    'overflow:hidden', 'border-radius:24px', 'z-index:-1'
-  ].join(';');
+  const cnv = document.createElement('canvas');
+  cnv.width  = W * SCALE;
+  cnv.height = H * SCALE;
+  const ctx  = cnv.getContext('2d');
+  ctx.scale(SCALE, SCALE);
 
-  // 2. Swap gradient wordmark classes for frozen solid-color equivalents
-  Object.entries(WM_FREEZE_MAP).forEach(([orig, frozen]) => {
-    clone.querySelectorAll('.' + orig).forEach(wm => {
-      wm.classList.remove(orig);
-      wm.classList.add(frozen);
-      wm.style.animation = 'none';
-      wm.style.background = 'none';
-    });
-  });
+  /* Helpers */
+  const rel = el => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left - rootRect.left, y: r.top - rootRect.top, w: r.width, h: r.height };
+  };
+  const setFont = cs => {
+    const style = cs.fontStyle !== 'normal' ? cs.fontStyle + ' ' : '';
+    ctx.font = `${style}${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    if ('letterSpacing' in ctx) ctx.letterSpacing = cs.letterSpacing === 'normal' ? '0px' : cs.letterSpacing;
+    ctx.textBaseline = 'alphabetic';
+  };
+  const textY = (elY, cs) => {
+    /* Place baseline so the cap-top aligns with the element's top edge */
+    const size = parseFloat(cs.fontSize);
+    const m    = ctx.measureText('A');
+    const asc  = m.actualBoundingBoxAscent || size * 0.78;
+    return elY + asc;
+  };
 
-  // 3. Copy QR img data from the live card into the clone
-  //    (cloneNode copies DOM but data-url src is preserved automatically for <img>)
-  //    Re-inject to be safe.
-  el.querySelectorAll('.qr-wrap img').forEach((liveImg, i) => {
-    const cloneWrap = clone.querySelectorAll('.qr-wrap')[i];
-    if (!cloneWrap) return;
-    cloneWrap.innerHTML = '';
-    const img = document.createElement('img');
-    img.src = liveImg.src;
-    img.width = 140; img.height = 140;
-    img.style.display = 'block'; img.style.borderRadius = '4px';
-    cloneWrap.appendChild(img);
-  });
+  /* Draw one DOM element: background, then its direct text nodes */
+  function renderEl(el) {
+    if (el.classList.contains('qr-wrap')) return; // handled separately
+    const { x, y, w, h } = rel(el);
+    if (w <= 0 || h <= 0) return;
 
-  // Suppress ::before/::after — the SVG feTurbulence in classic-front::after crashes html2canvas
-  clone.classList.add('capture-clone');
-  clone.querySelectorAll('*').forEach(c => c.classList.add('capture-clone'));
+    const cs = window.getComputedStyle(el);
 
-  document.body.appendChild(clone);
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-  await new Promise(r => setTimeout(r, 100));
+    /* Background colour */
+    const bg = cs.backgroundColor;
+    if (bg && bg !== 'rgba(0, 0, 0, 0)') {
+      ctx.fillStyle = bg;
+      ctx.fillRect(x, y, w, h);
+    }
 
-  const canvas = await html2canvas(clone, {
-    scale: SCALE, useCORS: true, backgroundColor: null,
-    logging: false, allowTaint: true
-  });
+    /* Direct text nodes */
+    const isClipText = (cs.webkitBackgroundClip || cs.backgroundClip) === 'text';
+    for (const node of el.childNodes) {
+      if (node.nodeType !== 3) continue;
+      const raw = node.textContent;
+      if (!raw.trim()) continue;
+      const text = cs.textTransform === 'uppercase' ? raw.toUpperCase() : raw;
+      setFont(cs);
+      ctx.fillStyle = isClipText ? GOLD : cs.color;
+      ctx.fillText(text, x, textY(y, cs));
+    }
 
-  // 4. Manually stamp QR codes — html2canvas drops them inside overflow:hidden
-  const ctx = canvas.getContext('2d');
-  const cloneRect = clone.getBoundingClientRect();
+    /* Recurse */
+    for (const child of el.children) renderEl(child);
+  }
 
-  clone.querySelectorAll('.qr-wrap').forEach(wrap => {
-    const wr = wrap.getBoundingClientRect();
-    const wx = Math.round((wr.left - cloneRect.left) * SCALE);
-    const wy = Math.round((wr.top  - cloneRect.top)  * SCALE);
+  /* ── 1. Card background ── */
+  const rootCS = window.getComputedStyle(rootEl);
+  ctx.fillStyle = rootCS.backgroundColor || '#1A1410';
+  ctx.fillRect(0, 0, W, H);
+
+  /* ── 2. Subtle gradient overlay (mirrors ::before on classic/holo fronts) ── */
+  if (rootEl.classList.contains('classic-front') || rootEl.classList.contains('holo-front')) {
+    const g = ctx.createLinearGradient(W * 0.15, 0, W * 0.75, H);
+    g.addColorStop(0.42, 'transparent');
+    g.addColorStop(0.48, 'rgba(184,132,26,0.04)');
+    g.addColorStop(0.50, 'rgba(255,240,180,0.08)');
+    g.addColorStop(0.52, 'rgba(184,132,26,0.04)');
+    g.addColorStop(0.58, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+  }
+  if (rootEl.classList.contains('classic-back') || rootEl.classList.contains('holo-back')) {
+    const g = ctx.createRadialGradient(W * 0.3, H * 0.5, 0, W * 0.3, H * 0.5, W * 0.55);
+    g.addColorStop(0,   'rgba(184,132,26,0.07)');
+    g.addColorStop(1,   'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  /* ── 3. Render all child elements ── */
+  for (const child of rootEl.children) renderEl(child);
+
+  /* ── 4. Stamp QR codes ── */
+  rootEl.querySelectorAll('.qr-wrap').forEach(wrap => {
+    const { x, y, w, h } = rel(wrap);
     ctx.fillStyle = '#F7F3EE';
-    ctx.fillRect(wx, wy, Math.round(wr.width * SCALE), Math.round(wr.height * SCALE));
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, w, h, 12);
+    else               ctx.rect(x, y, w, h);
+    ctx.fill();
     const qrEl = wrap.querySelector('img, canvas');
     if (qrEl) {
-      const qr = qrEl.getBoundingClientRect();
-      ctx.drawImage(qrEl,
-        Math.round((qr.left - cloneRect.left) * SCALE),
-        Math.round((qr.top  - cloneRect.top)  * SCALE),
-        Math.round(qr.width * SCALE), Math.round(qr.height * SCALE));
+      const qr = rel(qrEl);
+      ctx.drawImage(qrEl, qr.x, qr.y, qr.w, qr.h);
     }
   });
 
-  document.body.removeChild(clone);
-  return canvas;
+  return cnv;
 }
 
 function download(canvas, name) {
