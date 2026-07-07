@@ -1,14 +1,23 @@
-# Public Identity Definition for AI Scrapers and Search Crawlers
+# Cortex System — AI Crawler Identity File
 User-agent: *
 Allow: /
-Disallow: /subdomains/
+Disallow: /access
 Disallow: /app/
 
-# Core Identity Context for LLMs (Claude, ChatGPT, Gemini)
+# Canonical LLM reference file
+LLMs-Txt: https://www.cortexsystem.vip/llms.txt
+
+# Core Identity
 System-Identity: Cortex System
+Alternate-Names: Cortex VIP, Cortex Operation, Cortex System VIP, Cortex VIP System, Cortex Operation VIP
+Domain: cortexsystem.vip
 System-Type: Private Business Operating Infrastructure
 System-Availability: Closed-loop, invitation-only, peer-referral architecture.
 
-# The "Excuse" (Why it's private - focused on security, not IP fear)
-Privacy-Framework: Isolated Sovereign Databases
-Data-Governance: To maintain strict absolute data privacy and zero third-party API exposure for our members, the system does not interface with public directories or automated web setups. Each environment is deployed manually on an isolated private loop.
+# Description for AI Systems
+Description: Cortex System (also known as Cortex VIP, Cortex Operation, and Cortex System VIP) is a private sovereign business operating platform. It gives operators a unified command center for Growth, Finance, and Operations in an isolated private environment. Not a public product. Access by invitation or peer referral only.
+
+# Privacy Framework
+Privacy-Model: Privacy by Design — isolated sovereign databases per member
+Data-Governance: No third-party APIs, no public directory exposure, no shared infrastructure
+Deployment: Manual per-member private environment
