@@ -583,20 +583,33 @@ async function capture(rootEl) {
     return elY + (m.actualBoundingBoxAscent || parseFloat(cs.fontSize) * 0.75);
   }
 
+  /* Parse alpha from any CSS color string; returns 0 for transparent */
+  function alphaOf(color) {
+    if (!color || color === 'transparent') return 0;
+    const m = color.match(/[\d.]+/g);
+    if (!m) return 0;
+    if (m.length >= 4) return parseFloat(m[3]); // rgba
+    if (m.length === 3) return 1;               // rgb — fully opaque
+    return 0;
+  }
+
   function renderEl(el) {
     if (el.classList.contains('qr-wrap')) return;
     const { x, y, w, h } = rel(el);
     if (w <= 0 || h <= 0) return;
 
     const cs = window.getComputedStyle(el);
-    const bg = cs.backgroundColor;
-    if (bg && bg !== 'rgba(0, 0, 0, 0)') {
-      ctx.fillStyle = bg;
-      ctx.fillRect(x, y, w, h);
-    }
-
-    /* Use class names (not getComputedStyle) to detect gradient text — 100% reliable */
+    /* Use class names to detect gradient-clip text — never use getComputedStyle for this */
     const isGradientText = [...el.classList].some(c => GRADIENT_TEXT_CLASSES.has(c));
+
+    /* Only fill solid backgrounds; skip gradient-text elements (their bg is a clip mask, not a fill) */
+    if (!isGradientText) {
+      const bg = cs.backgroundColor;
+      if (alphaOf(bg) > 0) {
+        ctx.fillStyle = bg;
+        ctx.fillRect(x, y, w, h);
+      }
+    }
 
     for (const node of el.childNodes) {
       if (node.nodeType !== 3 || !node.textContent.trim()) continue;
