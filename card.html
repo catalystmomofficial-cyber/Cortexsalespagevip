@@ -546,6 +546,15 @@ async function capture(rootEl) {
   /* Wait up to 2s for fonts, then proceed regardless */
   await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 2000))]);
 
+  /* If the card is inside a hidden panel, temporarily reveal it off-screen so
+     getBoundingClientRect() returns real dimensions instead of 0×0 */
+  const panel = rootEl.closest('.panel');
+  let revealed = false;
+  if (panel && !panel.classList.contains('active')) {
+    panel.style.cssText = 'display:flex!important;position:fixed;top:-9999px;left:-9999px;visibility:hidden;pointer-events:none;';
+    revealed = true;
+  }
+
   const rootRect = rootEl.getBoundingClientRect();
   const W = Math.round(rootRect.width);
   const H = Math.round(rootRect.height);
@@ -633,6 +642,8 @@ async function capture(rootEl) {
     const qrEl = wrap.querySelector('img,canvas');
     if (qrEl) { const q = rel(qrEl); ctx.drawImage(qrEl, q.x, q.y, q.w, q.h); }
   }
+
+  if (revealed) panel.style.cssText = '';
 
   return cnv;
 }
