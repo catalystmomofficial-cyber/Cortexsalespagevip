@@ -518,10 +518,61 @@ new QRCode(document.getElementById('qrcode2'), {
   correctLevel: QRCode.CorrectLevel.H
 });
 
-/* ── CAPTURE ── */
-async function capture(el) {
-  return html2canvas(el, { scale: 3, useCORS: true, backgroundColor: null, logging: false });
+/* ── html2canvas cannot render background-clip:text (CSS gradient text).
+   Before every capture we swap gradient wordmarks to solid gold,
+   then restore after the PNG is generated. ── */
+
+const GOLD = '#B8841A';
+const CREAM_DIM = 'rgba(247,243,238,0.7)';
+
+function freezeGradientText(cardEl) {
+  // Find every element inside the card that uses background-clip:text
+  cardEl.querySelectorAll('[class*="wordmark"]').forEach(el => {
+    el.style.animation = 'none';
+    el.style.backgroundImage = 'none';
+    el.style.backgroundColor = GOLD;
+    el.style.webkitBackgroundClip = 'text';
+    el.style.backgroundClip = 'text';
+    el.style.color = 'transparent';
+    el.style.webkitTextFillColor = 'transparent';
+    // The <em> period — keep its cream colour
+    el.querySelectorAll('em').forEach(em => {
+      em.style.backgroundColor = 'transparent';
+      em.style.backgroundImage = 'none';
+      em.style.webkitBackgroundClip = 'initial';
+      em.style.backgroundClip = 'initial';
+      em.style.color = CREAM_DIM;
+      em.style.webkitTextFillColor = CREAM_DIM;
+    });
+  });
 }
+
+function thawGradientText(cardEl) {
+  cardEl.querySelectorAll('[class*="wordmark"]').forEach(el => {
+    el.style.animation = '';
+    el.style.backgroundImage = '';
+    el.style.backgroundColor = '';
+    el.style.color = '';
+    el.style.webkitTextFillColor = '';
+    el.querySelectorAll('em').forEach(em => {
+      em.style.backgroundColor = '';
+      em.style.backgroundImage = '';
+      em.style.webkitBackgroundClip = '';
+      em.style.backgroundClip = '';
+      em.style.color = '';
+      em.style.webkitTextFillColor = '';
+    });
+  });
+}
+
+async function capture(el) {
+  freezeGradientText(el);
+  await new Promise(r => setTimeout(r, 60)); // let paint settle
+  const canvas = await html2canvas(el, { scale: 3, useCORS: true, backgroundColor: null, logging: false });
+  thawGradientText(el);
+  return canvas;
+}
+
 function download(canvas, name) {
   const a = document.createElement('a');
   a.download = name + '.png';
@@ -546,56 +597,29 @@ async function dlBoth(selA, selB, prefix) {
   btns.forEach(b => b.disabled = false);
 }
 
-/* ── HOLOGRAPHIC PEAK-GLOW CAPTURE ── */
-function setPeak(els) {
-  els.forEach(el => {
-    el.style.animation = 'none';
-    el.style.backgroundPosition = '-30% 0';
-  });
-}
-function restoreAnim(els) {
-  els.forEach(el => {
-    el.style.animation = '';
-    el.style.backgroundPosition = '';
-  });
-}
+/* ── HOLOGRAPHIC: same capture (freezeGradientText handles it),
+   no separate setPeak needed anymore ── */
 
 async function dlHoloFront() {
   const btns = document.querySelectorAll('.dl-btn');
   btns.forEach(b => b.disabled = true);
-  const wm = [document.getElementById('holo-wm')];
-  setPeak(wm);
-  await new Promise(r => setTimeout(r, 80));
   download(await capture(document.getElementById('holo-front-card')), 'cortex-holo-front');
-  restoreAnim(wm);
   btns.forEach(b => b.disabled = false);
 }
 
 async function dlHoloBack() {
   const btns = document.querySelectorAll('.dl-btn');
   btns.forEach(b => b.disabled = true);
-  const wm = [document.getElementById('holo-back-wm')];
-  setPeak(wm);
-  await new Promise(r => setTimeout(r, 80));
   download(await capture(document.getElementById('holo-back-card')), 'cortex-holo-back');
-  restoreAnim(wm);
   btns.forEach(b => b.disabled = false);
 }
 
 async function dlHoloBoth() {
   const btns = document.querySelectorAll('.dl-btn');
   btns.forEach(b => b.disabled = true);
-  const frontWm = [document.getElementById('holo-wm')];
-  const backWm  = [document.getElementById('holo-back-wm')];
-  setPeak(frontWm);
-  await new Promise(r => setTimeout(r, 80));
   download(await capture(document.getElementById('holo-front-card')), 'cortex-holo-front');
-  restoreAnim(frontWm);
   await new Promise(r => setTimeout(r, 400));
-  setPeak(backWm);
-  await new Promise(r => setTimeout(r, 80));
   download(await capture(document.getElementById('holo-back-card')), 'cortex-holo-back');
-  restoreAnim(backWm);
   btns.forEach(b => b.disabled = false);
 }
 </script>
