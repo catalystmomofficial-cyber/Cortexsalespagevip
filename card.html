@@ -392,6 +392,8 @@ body {
 .wm-frozen-52 em, .wm-frozen-72 em, .wm-frozen-28 em {
   color: rgba(247,243,238,0.7); -webkit-text-fill-color: rgba(247,243,238,0.7); font-style: normal;
 }
+/* Clone used during PNG capture — strip pseudo-elements that break html2canvas */
+.capture-clone::before, .capture-clone::after { display: none !important; }
 </style>
 </head>
 <body>
@@ -606,6 +608,10 @@ async function capture(el) {
     img.style.display = 'block'; img.style.borderRadius = '4px';
     cloneWrap.appendChild(img);
   });
+
+  // Suppress ::before/::after — the SVG feTurbulence in classic-front::after crashes html2canvas
+  clone.classList.add('capture-clone');
+  clone.querySelectorAll('*').forEach(c => c.classList.add('capture-clone'));
 
   document.body.appendChild(clone);
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
