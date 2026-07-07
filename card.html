@@ -574,11 +574,45 @@ function thawGradientText(cardEl) {
 
 async function capture(el) {
   freezeGradientText(el);
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); // two frames to repaint
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   await new Promise(r => setTimeout(r, 80));
-  const canvas = await html2canvas(el, { scale: 3, useCORS: true, backgroundColor: null, logging: false, allowTaint: true });
+
+  const SCALE = 3;
+  const mainCanvas = await html2canvas(el, {
+    scale: SCALE, useCORS: true, backgroundColor: null, logging: false, allowTaint: true
+  });
+
+  // html2canvas sometimes drops QR codes inside overflow:hidden cards.
+  // Stamp them manually at the exact pixel position.
+  const ctx = mainCanvas.getContext('2d');
+  const cardRect = el.getBoundingClientRect();
+
+  el.querySelectorAll('.qr-wrap').forEach(wrap => {
+    const wr = wrap.getBoundingClientRect();
+    const wx = Math.round((wr.left - cardRect.left) * SCALE);
+    const wy = Math.round((wr.top  - cardRect.top)  * SCALE);
+    const ww = Math.round(wr.width  * SCALE);
+    const wh = Math.round(wr.height * SCALE);
+
+    // White background of the wrap
+    ctx.fillStyle = '#F7F3EE';
+    ctx.fillRect(wx, wy, ww, wh);
+
+    // The QR img or canvas inside
+    const qrEl = wrap.querySelector('img, canvas');
+    if (qrEl) {
+      const qr = qrEl.getBoundingClientRect();
+      ctx.drawImage(qrEl,
+        Math.round((qr.left - cardRect.left) * SCALE),
+        Math.round((qr.top  - cardRect.top)  * SCALE),
+        Math.round(qr.width  * SCALE),
+        Math.round(qr.height * SCALE)
+      );
+    }
+  });
+
   thawGradientText(el);
-  return canvas;
+  return mainCanvas;
 }
 
 function download(canvas, name) {
