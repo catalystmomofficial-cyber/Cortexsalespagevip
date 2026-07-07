@@ -536,160 +536,151 @@ new QRCode(document.getElementById('qrcode2'), {
 });
 setTimeout(() => qrToImg('qrcode2'), 200);
 
-/* ── CAPTURE: draw cards to canvas using the 2D API directly.
-   Reads element positions from getBoundingClientRect() on the live DOM.
-   No html2canvas — zero library bugs, zero CSS interpretation failures. ── */
-
-const GOLD       = '#B8841A';
-const CREAM_DIM  = 'rgba(247,243,238,0.7)';
-const SCALE      = 3;
+/* ── These classes use background-clip:text — must draw as solid gold in canvas ── */
+const GRADIENT_TEXT_CLASSES = new Set(['wordmark','holo-wordmark','holo-back-wordmark']);
+const GOLD      = '#B8841A';
+const CREAM_DIM = 'rgba(247,243,238,0.7)';
+const SCALE     = 3;
 
 async function capture(rootEl) {
-  await document.fonts.ready;
+  /* Wait up to 2s for fonts, then proceed regardless */
+  await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 2000))]);
 
   const rootRect = rootEl.getBoundingClientRect();
   const W = Math.round(rootRect.width);
   const H = Math.round(rootRect.height);
 
   const cnv = document.createElement('canvas');
-  cnv.width  = W * SCALE;
+  cnv.width = W * SCALE;
   cnv.height = H * SCALE;
-  const ctx  = cnv.getContext('2d');
+  const ctx = cnv.getContext('2d');
   ctx.scale(SCALE, SCALE);
 
-  /* Helpers */
-  const rel = el => {
+  function rel(el) {
     const r = el.getBoundingClientRect();
     return { x: r.left - rootRect.left, y: r.top - rootRect.top, w: r.width, h: r.height };
-  };
-  const setFont = cs => {
+  }
+
+  function applyFont(cs) {
     const style = cs.fontStyle !== 'normal' ? cs.fontStyle + ' ' : '';
     ctx.font = `${style}${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
     if ('letterSpacing' in ctx) ctx.letterSpacing = cs.letterSpacing === 'normal' ? '0px' : cs.letterSpacing;
     ctx.textBaseline = 'alphabetic';
-  };
-  const textY = (elY, cs) => {
-    /* Place baseline so the cap-top aligns with the element's top edge */
-    const size = parseFloat(cs.fontSize);
-    const m    = ctx.measureText('A');
-    const asc  = m.actualBoundingBoxAscent || size * 0.78;
-    return elY + asc;
-  };
+  }
 
-  /* Draw one DOM element: background, then its direct text nodes */
+  function baselineY(elY, cs) {
+    applyFont(cs);
+    const m = ctx.measureText('X');
+    return elY + (m.actualBoundingBoxAscent || parseFloat(cs.fontSize) * 0.75);
+  }
+
   function renderEl(el) {
-    if (el.classList.contains('qr-wrap')) return; // handled separately
+    if (el.classList.contains('qr-wrap')) return;
     const { x, y, w, h } = rel(el);
     if (w <= 0 || h <= 0) return;
 
     const cs = window.getComputedStyle(el);
-
-    /* Background colour */
     const bg = cs.backgroundColor;
     if (bg && bg !== 'rgba(0, 0, 0, 0)') {
       ctx.fillStyle = bg;
       ctx.fillRect(x, y, w, h);
     }
 
-    /* Direct text nodes */
-    const isClipText = (cs.webkitBackgroundClip || cs.backgroundClip) === 'text';
+    /* Use class names (not getComputedStyle) to detect gradient text — 100% reliable */
+    const isGradientText = [...el.classList].some(c => GRADIENT_TEXT_CLASSES.has(c));
+
     for (const node of el.childNodes) {
-      if (node.nodeType !== 3) continue;
-      const raw = node.textContent;
-      if (!raw.trim()) continue;
-      const text = cs.textTransform === 'uppercase' ? raw.toUpperCase() : raw;
-      setFont(cs);
-      ctx.fillStyle = isClipText ? GOLD : cs.color;
-      ctx.fillText(text, x, textY(y, cs));
+      if (node.nodeType !== 3 || !node.textContent.trim()) continue;
+      const txt = cs.textTransform === 'uppercase'
+        ? node.textContent.toUpperCase()
+        : node.textContent;
+      applyFont(cs);
+      ctx.fillStyle = isGradientText ? GOLD : cs.color;
+      ctx.fillText(txt, x, baselineY(y, cs));
     }
 
-    /* Recurse */
     for (const child of el.children) renderEl(child);
   }
 
-  /* ── 1. Card background ── */
-  const rootCS = window.getComputedStyle(rootEl);
-  ctx.fillStyle = rootCS.backgroundColor || '#1A1410';
+  /* 1 — background */
+  ctx.fillStyle = window.getComputedStyle(rootEl).backgroundColor || '#1A1410';
   ctx.fillRect(0, 0, W, H);
 
-  /* ── 2. Subtle gradient overlay (mirrors ::before on classic/holo fronts) ── */
+  /* 2 — decorative gradient (approximate ::before) */
   if (rootEl.classList.contains('classic-front') || rootEl.classList.contains('holo-front')) {
-    const g = ctx.createLinearGradient(W * 0.15, 0, W * 0.75, H);
-    g.addColorStop(0.42, 'transparent');
-    g.addColorStop(0.48, 'rgba(184,132,26,0.04)');
-    g.addColorStop(0.50, 'rgba(255,240,180,0.08)');
-    g.addColorStop(0.52, 'rgba(184,132,26,0.04)');
-    g.addColorStop(0.58, 'transparent');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
+    const g = ctx.createLinearGradient(W*0.15, 0, W*0.75, H);
+    g.addColorStop(0.42,'transparent'); g.addColorStop(0.48,'rgba(184,132,26,0.05)');
+    g.addColorStop(0.50,'rgba(255,240,180,0.09)'); g.addColorStop(0.52,'rgba(184,132,26,0.05)');
+    g.addColorStop(0.58,'transparent');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
   }
   if (rootEl.classList.contains('classic-back') || rootEl.classList.contains('holo-back')) {
-    const g = ctx.createRadialGradient(W * 0.3, H * 0.5, 0, W * 0.3, H * 0.5, W * 0.55);
-    g.addColorStop(0,   'rgba(184,132,26,0.07)');
-    g.addColorStop(1,   'transparent');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
+    const g = ctx.createRadialGradient(W*0.3,H*0.5,0, W*0.3,H*0.5,W*0.55);
+    g.addColorStop(0,'rgba(184,132,26,0.07)'); g.addColorStop(1,'transparent');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
   }
 
-  /* ── 3. Render all child elements ── */
+  /* 3 — render elements */
   for (const child of rootEl.children) renderEl(child);
 
-  /* ── 4. Stamp QR codes ── */
-  rootEl.querySelectorAll('.qr-wrap').forEach(wrap => {
+  /* 4 — stamp QR codes */
+  for (const wrap of rootEl.querySelectorAll('.qr-wrap')) {
     const { x, y, w, h } = rel(wrap);
     ctx.fillStyle = '#F7F3EE';
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(x, y, w, h, 12);
-    else               ctx.rect(x, y, w, h);
+    ctx.roundRect ? ctx.roundRect(x,y,w,h,12) : ctx.rect(x,y,w,h);
     ctx.fill();
-    const qrEl = wrap.querySelector('img, canvas');
-    if (qrEl) {
-      const qr = rel(qrEl);
-      ctx.drawImage(qrEl, qr.x, qr.y, qr.w, qr.h);
-    }
-  });
+    const qrEl = wrap.querySelector('img,canvas');
+    if (qrEl) { const q = rel(qrEl); ctx.drawImage(qrEl, q.x, q.y, q.w, q.h); }
+  }
 
   return cnv;
 }
 
-function download(canvas, name) {
-  const a = document.createElement('a');
-  a.download = name + '.png';
-  a.href = canvas.toDataURL('image/png');
+async function download(cnv, name) {
+  const blob = await new Promise(r => cnv.toBlob(r, 'image/png'));
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = name + '.png';
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-/* onclick="dlCard(...)" needs dlCard on window — const/let are NOT global */
+/* onclick needs functions on window (const/let are block-scoped, not global) */
 function withBtns(fn) {
   return async function(...args) {
     const btns = document.querySelectorAll('.dl-btn');
     btns.forEach(b => b.disabled = true);
-    try { await fn(...args); } finally { btns.forEach(b => b.disabled = false); }
+    try {
+      await fn(...args);
+    } catch(e) {
+      alert('Download failed: ' + e.message);
+    } finally {
+      btns.forEach(b => b.disabled = false);
+    }
   };
 }
 
 window.dlCard = withBtns(async (sel, name) => {
-  download(await capture(document.querySelector(sel)), name);
+  await download(await capture(document.querySelector(sel)), name);
 });
-
 window.dlBoth = withBtns(async (selA, selB, prefix) => {
-  download(await capture(document.querySelector(selA)), prefix + '-front');
-  await new Promise(r => setTimeout(r, 300));
-  download(await capture(document.querySelector(selB)), prefix + '-back');
+  await download(await capture(document.querySelector(selA)), prefix + '-front');
+  await new Promise(r => setTimeout(r, 400));
+  await download(await capture(document.querySelector(selB)), prefix + '-back');
 });
-
 window.dlHoloFront = withBtns(async () => {
-  download(await capture(document.getElementById('holo-front-card')), 'cortex-holo-front');
+  await download(await capture(document.getElementById('holo-front-card')), 'cortex-holo-front');
 });
-
 window.dlHoloBack = withBtns(async () => {
-  download(await capture(document.getElementById('holo-back-card')), 'cortex-holo-back');
+  await download(await capture(document.getElementById('holo-back-card')), 'cortex-holo-back');
 });
-
 window.dlHoloBoth = withBtns(async () => {
-  download(await capture(document.getElementById('holo-front-card')), 'cortex-holo-front');
-  await new Promise(r => setTimeout(r, 300));
-  download(await capture(document.getElementById('holo-back-card')), 'cortex-holo-back');
+  await download(await capture(document.getElementById('holo-front-card')), 'cortex-holo-front');
+  await new Promise(r => setTimeout(r, 400));
+  await download(await capture(document.getElementById('holo-back-card')), 'cortex-holo-back');
 });
 </script>
 </body>
